@@ -8,47 +8,37 @@ import token.TokenType;
 
 public class Lexer {
 
-    public List<Token> tokenize(String source) {
+    private final String source;
+    private int position;
+    private char currentChar;
 
-        List<Token> tokens = new ArrayList<>();
+    public Lexer(String source) {
+        this.source = source;
+        this.position = 0;
 
-        String[] words = source.split("\\s+");
-
-        for (String word : words) {
-
-            if (word.equals("সংখ্যা")) {
-                tokens.add(new Token(TokenType.KEYWORD, word));
-            }
-
-            else if (word.matches("[0-9]+;?")) {
-
-                if (word.endsWith(";")) {
-
-                    tokens.add(new Token(
-                            TokenType.NUMBER,
-                            word.substring(0, word.length() - 1)));
-
-                    tokens.add(new Token(TokenType.SEMICOLON, ";"));
-
-                } else {
-                    tokens.add(new Token(TokenType.NUMBER, word));
-                }
-
-            }
-
-            else if (word.equals("=")) {
-                tokens.add(new Token(TokenType.ASSIGN, word));
-            }
-
-            else {
-                tokens.add(new Token(TokenType.IDENTIFIER, word));
-            }
-
+        if (source.length() > 0) {
+            currentChar = source.charAt(0);
+        } else {
+            currentChar = '\0';
         }
-
-        tokens.add(new Token(TokenType.EOF, ""));
-
-        return tokens;
     }
 
+    private void advance() {
+        position++;
+        if (position >= source.length()) {
+            currentChar = '\0';
+        } else {
+            currentChar = source.charAt(position);
+        }
+    }
+
+    private void skipWhitespace() {
+        while (Character.isWhitespace(currentChar)) {
+            advance();
+        }
+    }
+
+    public List<Token> tokenize() {
+        return new ArrayList<>();
+    }
 }

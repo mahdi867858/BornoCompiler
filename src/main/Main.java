@@ -7,11 +7,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Lexer lexer = new Lexer();
-
         String code = "সংখ্যা বয়স = 20;";
+        Lexer lexer = new Lexer(code);
 
-        for (Token token : lexer.tokenize(code)) {
+        for (Token token : lexer.tokenize()) {
             System.out.println(token);
         }
 
