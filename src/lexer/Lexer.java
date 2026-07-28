@@ -33,8 +33,14 @@ public class Lexer {
     }
 
     private void skipWhitespace() {
-        while (Character.isWhitespace(currentChar)) {
-            advance();
+        while (Character.isWhitespace(currentChar) || currentChar == '#') {
+            if (currentChar == '#') {
+                while (currentChar != '\0' && currentChar != '\n' && currentChar != '\r') {
+                    advance();
+                }
+            } else {
+                advance();
+            }
         }
     }
 

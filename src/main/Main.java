@@ -1,31 +1,33 @@
 package main;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import lexer.Lexer;
 import token.Token;
 
 public class Main {
 
     public static void main(String[] args) {
+        String[] files = {
+            "examples/test1.brn",
+            "examples/test2.brn",
+            "examples/test3.brn",
+            "examples/test4.brn"
+        };
 
-        System.out.println("--- Test 1 ---");
-        runTest("সংখ্যা a = 10;");
-
-        System.out.println("\n--- Test 2 ---");
-        runTest("লেখা নাম = \"Mahdi\";");
-
-        System.out.println("\n--- Test 3 ---");
-        runTest("""
-        যদি (a >= 10)
-        {
-            দেখাও("OK");
-        }
-        """);
-    }
-
-    private static void runTest(String code) {
-        Lexer lexer = new Lexer(code);
-        for (Token token : lexer.tokenize()) {
-            System.out.println(token);
+        for (String file : files) {
+            System.out.println("--- Running " + file + " ---");
+            try {
+                String source = Files.readString(Path.of(file));
+                Lexer lexer = new Lexer(source);
+                for (Token token : lexer.tokenize()) {
+                    System.out.println(token);
+                }
+            } catch (IOException e) {
+                System.err.println("Error reading file " + file + ": " + e.getMessage());
+            }
+            System.out.println();
         }
     }
 
