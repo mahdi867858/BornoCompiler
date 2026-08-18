@@ -102,10 +102,19 @@ public class SemanticAnalyzer {
             );
         }
 
-        // Each block gets its own scope (child inherits parent's symbols)
-        analyzeStatements(node.getThenBranch(), new SymbolTable(scope));
-        analyzeStatements(node.getElseBranch(), new SymbolTable(scope));
-        System.out.println("  [✔] If statement valid");
+        // then block — নিজস্ব child scope
+        if (!node.getThenBranch().isEmpty()) {
+            System.out.println("  [Scope] যদি (then) block:");
+            analyzeStatements(node.getThenBranch(), new SymbolTable(scope));
+        }
+
+        // else block — নিজস্ব child scope
+        if (!node.getElseBranch().isEmpty()) {
+            System.out.println("  [Scope] নাহলে (else) block:");
+            analyzeStatements(node.getElseBranch(), new SymbolTable(scope));
+        }
+
+        System.out.println("  [✔] If-Else statement valid");
     }
 
     // ─── Print Statement ──────────────────────────────────────────────────────
