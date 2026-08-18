@@ -13,12 +13,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ═══ TEST 1: Valid code ═══════════════════════════════════════════════
-        System.out.println("════════════════════════════════════════");
-        System.out.println("  TEST 1 — Valid code");
-        System.out.println("════════════════════════════════════════");
-
-        String code1 = """
+        // ═══ TEST 1: Valid IF-ELSE ════════════════════════════════════════════
+        test("TEST 1 — Valid IF-ELSE (error ছাড়া pass হওয়া উচিত)", """
                 সংখ্যা বয়স = 20;
                 লেখা নাম = "Mahdi";
 
@@ -30,69 +26,60 @@ public class Main {
                 {
                     সংখ্যা status = 0;
                 }
-                """;
+                """, false);
 
-        runTest(code1);
+        // ═══ TEST 2: IF condition NOT boolean ════════════════════════════════
+        test("TEST 2 — IF condition NUMBER (error আশা করা হচ্ছে)", """
+                সংখ্যা বয়স = 20;
 
-        // ═══ TEST 2: Type mismatch ════════════════════════════════════════════
-        System.out.println("\n════════════════════════════════════════");
-        System.out.println("  TEST 2 — Type mismatch (expect error)");
-        System.out.println("════════════════════════════════════════");
+                যদি (বয়স)
+                {
+                    সংখ্যা status = 1;
+                }
+                """, true);
 
-        String code2 = """
+        // ═══ TEST 3: Wrong declaration type ══════════════════════════════════
+        test("TEST 3 — Type mismatch: সংখ্যা = string (error আশা করা হচ্ছে)", """
                 সংখ্যা বয়স = "Mahdi";
-                """;
+                """, true);
 
-        runTestExpectError(code2);
+        // ═══ TEST 4: Undeclared variable ══════════════════════════════════════
+        test("TEST 4 — Undeclared variable (error আশা করা হচ্ছে)", """
+                সংখ্যা বয়স = x + 10;
+                """, true);
+    }
 
-        // ═══ TEST 3: Undeclared variable ══════════════════════════════════════
+    // ─── Runner ────────────────────────────────────────────────────────────────
+
+    private static void test(String label, String code, boolean expectError) {
         System.out.println("\n════════════════════════════════════════");
-        System.out.println("  TEST 3 — Undeclared variable (expect error)");
+        System.out.println("  " + label);
         System.out.println("════════════════════════════════════════");
 
-        String code3 = """
-                সংখ্যা x = y + 10;
-                """;
-
-        runTestExpectError(code3);
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    private static void runTest(String code) {
         try {
-            Lexer lexer       = new Lexer(code);
-            List<Token> tokens = lexer.tokenize();
-            Parser parser     = new Parser(tokens);
-            ProgramNode ast   = parser.parseProgram();
+            List<Token> tokens = new Lexer(code).tokenize();
+            ProgramNode ast    = new Parser(tokens).parseProgram();
 
-            System.out.println("\n  AST:");
-            new ASTPrinter().print(ast);
+            if (!expectError) {
+                new ASTPrinter().print(ast);
+                System.out.println();
+            }
 
-            System.out.println();
-            SemanticAnalyzer analyzer = new SemanticAnalyzer();
-            analyzer.analyze(ast);
+            new SemanticAnalyzer().analyze(ast);
 
-            System.out.println("\nStatements: " + ast.getStatements().size());
+            if (expectError) {
+                System.out.println("  ❌ Error ধরা পড়েনি! Test FAIL।");
+            } else {
+                System.out.println("  ✅ PASS — Semantic analysis completed successfully!");
+            }
 
         } catch (RuntimeException e) {
-            System.out.println("  [ERROR] " + e.getMessage());
-        }
-    }
-
-    private static void runTestExpectError(String code) {
-        try {
-            Lexer lexer       = new Lexer(code);
-            List<Token> tokens = lexer.tokenize();
-            Parser parser     = new Parser(tokens);
-            ProgramNode ast   = parser.parseProgram();
-            SemanticAnalyzer analyzer = new SemanticAnalyzer();
-            analyzer.analyze(ast);
-
-            System.out.println("  ❌ Error ধরা পড়েনি! Test fail।");
-
-        } catch (RuntimeException e) {
-            System.out.println("  ✅ Expected error ধরা পড়েছে: " + e.getMessage());
+            if (expectError) {
+                System.out.println("  ✅ PASS — Expected error ধরা পড়েছে:");
+                System.out.println("     " + e.getMessage());
+            } else {
+                System.out.println("  ❌ FAIL — Unexpected error: " + e.getMessage());
+            }
         }
     }
 }
