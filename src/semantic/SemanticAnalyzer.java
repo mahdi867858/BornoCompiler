@@ -167,8 +167,23 @@ public class SemanticAnalyzer {
                         "' শুধু NUMBER দিয়ে করা যাবে। পেলাম: " + left + ", " + right
                     );
                 }
+
+                // Compile-time division by zero detection (literal denominator)
+                if ((op.equals("/") || op.equals("%")) &&
+                    bin.getRight() instanceof LiteralNode) {
+                    String val = ((LiteralNode) bin.getRight()).getValue();
+                    try {
+                        if (Double.parseDouble(val) == 0) {
+                            throw new RuntimeException(
+                                "[Semantic Error] Division by zero is not allowed."
+                            );
+                        }
+                    } catch (NumberFormatException ignored) { }
+                }
+
                 return Type.NUMBER;
             }
+
 
             // Comparison: ==, !=, <, >, <=, >=
             if (op.equals("==") || op.equals("!=") ||
