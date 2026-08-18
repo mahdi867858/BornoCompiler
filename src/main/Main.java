@@ -13,67 +13,73 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ═══ TEST 1: Simple WHILE ═════════════════════════════════════════════
-        test("TEST 1 — Simple WHILE loop", """
-                সংখ্যা i = 0;
+        // ═══ TEST 1: Valid IF-ELSE ════════════════════════════════════════════
+        test("TEST 1 — Valid IF-ELSE (error ছাড়া pass হওয়া উচিত)", """
+                সংখ্যা বয়স = 20;
+                লেখা নাম = "Mahdi";
 
-                যতক্ষণ (i < 10)
+                যদি (বয়স >= 18)
                 {
-                    i = i + 1;
+                    সংখ্যা status = 1;
+                }
+                নাহলে
+                {
+                    সংখ্যা status = 0;
                 }
                 """, false);
 
-        // ═══ TEST 2: WHILE with IF-ELSE inside ════════════════════════════════
-        test("TEST 2 — WHILE + IF-ELSE nested", """
-                সংখ্যা i = 0;
+        // ═══ TEST 2: IF condition NOT boolean ════════════════════════════════
+        test("TEST 2 — IF condition NUMBER (error আশা করা হচ্ছে)", """
+                সংখ্যা বয়স = 20;
 
-                যতক্ষণ (i < 10)
+                যদি (বয়স)
                 {
-                    যদি (i >= 5)
-                    {
-                        i = i + 1;
-                    }
-                    নাহলে
-                    {
-                        i = i + 2;
-                    }
-                }
-                """, false);
-
-        // ═══ TEST 3: WHILE condition not boolean ══════════════════════════════
-        test("TEST 3 — WHILE condition NUMBER (error আশা করা হচ্ছে)", """
-                সংখ্যা i = 0;
-
-                যতক্ষণ (i)
-                {
-                    i = i + 1;
+                    সংখ্যা status = 1;
                 }
                 """, true);
+
+        // ═══ TEST 3: Wrong declaration type ══════════════════════════════════
+        test("TEST 3 — Type mismatch: সংখ্যা = string (error আশা করা হচ্ছে)", """
+                সংখ্যা বয়স = "Mahdi";
+                """, true);
+
+        // ═══ TEST 4: Undeclared variable ══════════════════════════════════════
+        test("TEST 4 — Undeclared variable (error আশা করা হচ্ছে)", """
+                সংখ্যা বয়স = x + 10;
+                """, true);
     }
+
+    // ─── Runner ────────────────────────────────────────────────────────────────
 
     private static void test(String label, String code, boolean expectError) {
         System.out.println("\n════════════════════════════════════════");
         System.out.println("  " + label);
         System.out.println("════════════════════════════════════════");
+
         try {
             List<Token> tokens = new Lexer(code).tokenize();
             ProgramNode ast    = new Parser(tokens).parseProgram();
 
-            System.out.println("  AST:");
-            new ASTPrinter().print(ast);
-            System.out.println();
+            if (!expectError) {
+                new ASTPrinter().print(ast);
+                System.out.println();
+            }
 
             new SemanticAnalyzer().analyze(ast);
 
-            System.out.println("Parsing completed successfully!");
-            System.out.println("Semantic analysis completed successfully!");
-
-            if (expectError) System.out.println("  ❌ Error ধরা পড়েনি! Test FAIL।");
-            else             System.out.println("  ✅ PASS");
+            if (expectError) {
+                System.out.println("  ❌ Error ধরা পড়েনি! Test FAIL।");
+            } else {
+                System.out.println("  ✅ PASS — Semantic analysis completed successfully!");
+            }
 
         } catch (RuntimeException e) {
-            if (expectError) System.out.println("  ✅ PASS — " + e.getMessage());
-            else             System.out.println("  ❌ FAIL — " + e.getMessage());
+            if (expectError) {
+                System.out.println("  ✅ PASS — Expected error ধরা পড়েছে:");
+                System.out.println("     " + e.getMessage());
+            } else {
+                System.out.println("  ❌ FAIL — Unexpected error: " + e.getMessage());
+            }
         }
     }
 }

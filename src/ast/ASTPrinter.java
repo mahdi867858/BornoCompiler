@@ -58,17 +58,6 @@ public class ASTPrinter {
                 }
             }
 
-        } else if (node instanceof WhileNode) {
-            WhileNode w = (WhileNode) node;
-            System.out.println(prefix + branch + "While");
-            System.out.println(childPrefix + "├── Condition");
-            printNode(w.getCondition(), childPrefix + "│   ", true);
-            System.out.println(childPrefix + "└── Body");
-            List<ASTNode> body = w.getBody();
-            for (int i = 0; i < body.size(); i++) {
-                printNode(body.get(i), childPrefix + "    ", i == body.size() - 1);
-            }
-
         } else if (node instanceof BinaryExpressionNode) {
             BinaryExpressionNode b = (BinaryExpressionNode) node;
             System.out.println(prefix + branch + "BinaryExpr: " + b.getOperator());
