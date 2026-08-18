@@ -12,26 +12,23 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ══ TEST 1: সংখ্যা-তে string assign ══════════════════════════════════
+        // ══ Task 3 — IF condition must be BOOLEAN ════════════════════════════
         System.out.println("════════════════════════════════════════");
-        System.out.println("  TEST 1 — Type Error");
-        System.out.println("  সংখ্যা বয়স = \"Mahdi\";");
-        System.out.println("════════════════════════════════════════");
-
-        runTest("""
-                সংখ্যা বয়স = "Mahdi";
-                """);
-
-        // ══ TEST 2: undeclared variable use ═══════════════════════════════════
-        System.out.println("\n════════════════════════════════════════");
-        System.out.println("  TEST 2 — Undeclared Variable");
-        System.out.println("  সংখ্যা বয়স = 20;");
-        System.out.println("  সংখ্যা result = বয়স + নাম;");
+        System.out.println("  Task 3 — IF Condition Type Error");
+        System.out.println("  যদি (বয়স) — বয়স is NUMBER, not BOOLEAN");
         System.out.println("════════════════════════════════════════");
 
         runTest("""
                 সংখ্যা বয়স = 20;
-                সংখ্যা result = বয়স + নাম;
+
+                যদি (বয়স)
+                {
+                    সংখ্যা status = 1;
+                }
+                নাহলে
+                {
+                    সংখ্যা status = 0;
+                }
                 """);
     }
 
@@ -41,11 +38,9 @@ public class Main {
             ProgramNode ast    = new Parser(tokens).parseProgram();
             new SemanticAnalyzer().analyze(ast);
 
-            // এখানে পৌঁছালে কোনো error নেই — unexpected
             System.out.println("  ⚠️  কোনো error ধরা পড়েনি!");
 
         } catch (RuntimeException e) {
-            // Stack trace ছাড়া শুধু clean error message
             System.out.println("  ❌ Compiler Error:");
             System.out.println("     " + e.getMessage());
         }
