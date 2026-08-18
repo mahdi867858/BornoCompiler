@@ -3,75 +3,102 @@ package ast;
 import java.util.List;
 
 /**
- * ASTPrinter — AST-কে সুন্দর tree আকারে print করে।
+ * ASTPrinter — Compiler-style syntax tree।
+ * Format: indented tree with TYPE/NAME/VALUE labels
  */
 public class ASTPrinter {
 
     public void print(ASTNode node) {
-        printNode(node, "", true);
+        System.out.println("PROGRAM");
+        if (node instanceof ProgramNode) {
+            List<ASTNode> stmts = ((ProgramNode) node).getStatements();
+            for (int i = 0; i < stmts.size(); i++) {
+                boolean last = (i == stmts.size() - 1);
+                printNode(stmts.get(i), "│", last);
+            }
+        }
     }
 
     private void printNode(ASTNode node, String prefix, boolean isLast) {
-        String branch = isLast ? "└── " : "├── ";
+        String connector   = isLast ? "└── " : "├── ";
         String childPrefix = prefix + (isLast ? "    " : "│   ");
 
-        if (node instanceof ProgramNode) {
-            System.out.println("Program");
-            List<ASTNode> stmts = ((ProgramNode) node).getStatements();
-            for (int i = 0; i < stmts.size(); i++) {
-                printNode(stmts.get(i), "", i == stmts.size() - 1);
+        if (node instanceof AssignmentNode) {
+            AssignmentNode n = (AssignmentNode) node;
+
+            if (n.getDeclaredType() != null) {
+                // নতুন declaration
+                System.out.println(prefix + connector + "DECLARATION");
+                System.out.println(childPrefix + "├── TYPE  : " + n.getDeclaredType());
+                System.out.println(childPrefix + "├── NAME  : " + n.getVariableName());
+                System.out.print  (childPrefix + "└── VALUE : ");
+                printInline(n.getExpression());
+                System.out.println();
+            } else {
+                // re-assignment
+                System.out.println(prefix + connector + "ASSIGNMENT");
+                System.out.println(childPrefix + "├── NAME  : " + n.getVariableName());
+                System.out.print  (childPrefix + "└── VALUE : ");
+                printInline(n.getExpression());
+                System.out.println();
             }
 
-        } else if (node instanceof AssignmentNode) {
-            AssignmentNode n = (AssignmentNode) node;
-            String typeTag = n.getDeclaredType() != null ? " [" + n.getDeclaredType() + "]" : "";
-            System.out.println(prefix + branch + "Assignment: " + n.getVariableName() + typeTag);
-            printNode(n.getExpression(), childPrefix, true);
-
         } else if (node instanceof PrintNode) {
-            System.out.println(prefix + branch + "Print");
-            printNode(((PrintNode) node).getExpression(), childPrefix, true);
+            System.out.println(prefix + connector + "PRINT");
+            System.out.print  (childPrefix + "└── EXPR  : ");
+            printInline(((PrintNode) node).getExpression());
+            System.out.println();
 
         } else if (node instanceof IfNode) {
             IfNode n = (IfNode) node;
-            System.out.println(prefix + branch + "If");
+            System.out.println(prefix + connector + "IF");
 
-            // Condition
-            System.out.println(childPrefix + "├── Condition");
-            printNode(n.getCondition(), childPrefix + "│   ", true);
+            // CONDITION
+            System.out.print(childPrefix + "├── CONDITION : ");
+            printInline(n.getCondition());
+            System.out.println();
 
-            // Then branch
+            // THEN
             boolean hasElse = n.hasElse();
-            System.out.println(childPrefix + (hasElse ? "├── " : "└── ") + "Then");
-            String thenPrefix = childPrefix + (hasElse ? "│   " : "    ");
-            List<ASTNode> thenStmts = n.getThenBranch();
-            for (int i = 0; i < thenStmts.size(); i++) {
-                printNode(thenStmts.get(i), thenPrefix, i == thenStmts.size() - 1);
+            System.out.println(childPrefix + (hasElse ? "├── " : "└── ") + "THEN");
+            String thenPfx = childPrefix + (hasElse ? "│   " : "    ");
+            List<ASTNode> thenBranch = n.getThenBranch();
+            for (int i = 0; i < thenBranch.size(); i++) {
+                printNode(thenBranch.get(i), thenPfx, i == thenBranch.size() - 1);
             }
 
-            // Else branch
+            // ELSE
             if (hasElse) {
-                System.out.println(childPrefix + "└── Else");
-                List<ASTNode> elseStmts = n.getElseBranch();
-                for (int i = 0; i < elseStmts.size(); i++) {
-                    printNode(elseStmts.get(i), childPrefix + "    ", i == elseStmts.size() - 1);
+                System.out.println(childPrefix + "└── ELSE");
+                List<ASTNode> elseBranch = n.getElseBranch();
+                for (int i = 0; i < elseBranch.size(); i++) {
+                    printNode(elseBranch.get(i), childPrefix + "    ", i == elseBranch.size() - 1);
                 }
             }
 
-        } else if (node instanceof BinaryExpressionNode) {
-            BinaryExpressionNode b = (BinaryExpressionNode) node;
-            System.out.println(prefix + branch + "BinaryExpr: " + b.getOperator());
-            printNode(b.getLeft(), childPrefix, false);
-            printNode(b.getRight(), childPrefix, true);
+        } else {
+            System.out.println(prefix + connector + node.getClass().getSimpleName());
+        }
+    }
 
-        } else if (node instanceof LiteralNode) {
-            System.out.println(prefix + branch + "Literal: " + ((LiteralNode) node).getValue());
+    /** Expression-কে একলাইনে print করে — যেমন: (বয়স >= 18) */
+    private void printInline(ASTNode node) {
+        if (node instanceof LiteralNode) {
+            System.out.print(((LiteralNode) node).getValue());
 
         } else if (node instanceof VariableNode) {
-            System.out.println(prefix + branch + "Variable: " + ((VariableNode) node).getName());
+            System.out.print(((VariableNode) node).getName());
+
+        } else if (node instanceof BinaryExpressionNode) {
+            BinaryExpressionNode b = (BinaryExpressionNode) node;
+            System.out.print("(");
+            printInline(b.getLeft());
+            System.out.print(" " + b.getOperator() + " ");
+            printInline(b.getRight());
+            System.out.print(")");
 
         } else {
-            System.out.println(prefix + branch + node.getClass().getSimpleName());
+            System.out.print(node.getClass().getSimpleName());
         }
     }
 }
