@@ -1,12 +1,18 @@
 package ast;
 
+import java.util.List;
+
 public class IfNode extends ASTNode {
 
     private final ASTNode condition;
-    private final ASTNode thenBranch;
-    private final ASTNode elseBranch; // null যদি else না থাকে
+    private final List<ASTNode> thenBranch;
+    private final List<ASTNode> elseBranch; // empty list যদি else না থাকে
 
-    public IfNode(ASTNode condition, ASTNode thenBranch, ASTNode elseBranch) {
+    public IfNode(
+            ASTNode condition,
+            List<ASTNode> thenBranch,
+            List<ASTNode> elseBranch) {
+
         this.condition = condition;
         this.thenBranch = thenBranch;
         this.elseBranch = elseBranch;
@@ -16,15 +22,15 @@ public class IfNode extends ASTNode {
         return condition;
     }
 
-    public ASTNode getThenBranch() {
+    public List<ASTNode> getThenBranch() {
         return thenBranch;
     }
 
-    public ASTNode getElseBranch() {
+    public List<ASTNode> getElseBranch() {
         return elseBranch;
     }
 
     public boolean hasElse() {
-        return elseBranch != null;
+        return elseBranch != null && !elseBranch.isEmpty();
     }
 }
