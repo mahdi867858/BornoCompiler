@@ -1,6 +1,5 @@
 package main;
 
-import ast.ASTPrinter;
 import ast.ProgramNode;
 import lexer.Lexer;
 import parser.Parser;
@@ -13,49 +12,42 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ══════════════════════════════════════════════════════════════
-        //  BornoCompiler — Bangla Programming Language
-        //  Stages: Lexer → Parser → AST → Semantic Analysis
-        // ══════════════════════════════════════════════════════════════
-
-        String code = """
-                সংখ্যা বয়স = 20;
-                লেখা নাম = "Mahdi";
-
-                যদি (বয়স >= 18)
-                {
-                    সংখ্যা status = 1;
-                }
-                নাহলে
-                {
-                    সংখ্যা status = 0;
-                }
-                """;
-
+        // ══ TEST 1: সংখ্যা-তে string assign ══════════════════════════════════
         System.out.println("════════════════════════════════════════");
-        System.out.println("  BornoCompiler — Source Code");
+        System.out.println("  TEST 1 — Type Error");
+        System.out.println("  সংখ্যা বয়স = \"Mahdi\";");
         System.out.println("════════════════════════════════════════");
-        System.out.println(code);
 
-        // ── Step 1: Lexer ─────────────────────────────────────────────
-        System.out.println("════════════════════════════════════════");
-        System.out.println("  Lexer Output (Tokens)");
-        System.out.println("════════════════════════════════════════");
-        List<Token> tokens = new Lexer(code).tokenize();
-        for (Token t : tokens) System.out.println("  " + t);
+        runTest("""
+                সংখ্যা বয়স = "Mahdi";
+                """);
 
-        // ── Step 2: Parser → AST ──────────────────────────────────────
+        // ══ TEST 2: undeclared variable use ═══════════════════════════════════
         System.out.println("\n════════════════════════════════════════");
-        System.out.println("  Parser → AST");
+        System.out.println("  TEST 2 — Undeclared Variable");
+        System.out.println("  সংখ্যা বয়স = 20;");
+        System.out.println("  সংখ্যা result = বয়স + নাম;");
         System.out.println("════════════════════════════════════════");
-        ProgramNode ast = new Parser(tokens).parseProgram();
-        new ASTPrinter().print(ast);
 
-        System.out.println("\nParsing completed successfully!");
-        System.out.println("Statements: " + ast.getStatements().size());
+        runTest("""
+                সংখ্যা বয়স = 20;
+                সংখ্যা result = বয়স + নাম;
+                """);
+    }
 
-        // ── Step 3: Semantic Analysis ─────────────────────────────────
-        System.out.println();
-        new SemanticAnalyzer().analyze(ast);
+    private static void runTest(String code) {
+        try {
+            List<Token> tokens = new Lexer(code).tokenize();
+            ProgramNode ast    = new Parser(tokens).parseProgram();
+            new SemanticAnalyzer().analyze(ast);
+
+            // এখানে পৌঁছালে কোনো error নেই — unexpected
+            System.out.println("  ⚠️  কোনো error ধরা পড়েনি!");
+
+        } catch (RuntimeException e) {
+            // Stack trace ছাড়া শুধু clean error message
+            System.out.println("  ❌ Compiler Error:");
+            System.out.println("     " + e.getMessage());
+        }
     }
 }
