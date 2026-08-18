@@ -9,18 +9,18 @@ import token.TokenType;
 /**
  * Parser — Borno Compiler
  *
- * Grammar (simplified):
- *   program       → statement* EOF
- *   statement     → assignStmt | printStmt | ifStmt
- *   assignStmt    → KEYWORD IDENTIFIER '=' expression ';'
- *   printStmt     → 'দেখাও' '(' expression ')' ';'
- *   ifStmt        → 'যদি' '(' expression ')' block ( 'নাহলে' block )?
- *   block         → '{' statement* '}'
- *   expression    → comparison
- *   comparison    → addition ( ('==' | '!=' | '<' | '>' | '<=' | '>=') addition )*
- *   addition      → multiplication ( ('+' | '-') multiplication )*
- *   multiplication→ primary ( ('*' | '/' | '%') primary )*
- *   primary       → NUMBER | STRING | IDENTIFIER | '(' expression ')'
+ * Grammar:
+ *   program        → statement* EOF
+ *   statement      → assignStmt | printStmt | ifStmt
+ *   assignStmt     → ('সংখ্যা'|'লেখা') IDENTIFIER '=' expression ';'
+ *   printStmt      → 'দেখাও' '(' expression ')' ';'
+ *   ifStmt         → 'যদি' '(' expression ')' '{' statement* '}'
+ *                    ( 'নাহলে' '{' statement* '}' )?
+ *   expression     → comparison
+ *   comparison     → addition ( ('=='|'!='|'<'|'>'|'<='|'>=') addition )*
+ *   addition       → multiplication ( ('+'|'-') multiplication )*
+ *   multiplication → primary ( ('*'|'/'|'%') primary )*
+ *   primary        → NUMBER | STRING | IDENTIFIER | '(' expression ')'
  */
 public class Parser {
 
@@ -31,16 +31,10 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    // ─── Token helpers ───────────────────────────────────────────────────────
+    // ─── Token helpers ────────────────────────────────────────────────────────
 
     private Token currentToken() {
         return tokens.get(position);
-    }
-
-    private Token peek(int offset) {
-        int idx = position + offset;
-        if (idx >= tokens.size()) return tokens.get(tokens.size() - 1);
-        return tokens.get(idx);
     }
 
     private void advance() {
@@ -67,6 +61,14 @@ public class Parser {
 
     private boolean checkValue(String value) {
         return currentToken().getValue().equals(value);
+    }
+
+    private boolean match(TokenType type) {
+        if (check(type)) {
+            advance();
+            return true;
+        }
+        return false;
     }
 
     // ─── Entry Point ──────────────────────────────────────────────────────────
@@ -102,27 +104,26 @@ public class Parser {
                     return parseIf();
 
                 default:
-                    // অজানা keyword — skip
                     advance();
                     return null;
             }
         }
 
-        // অজানা token — skip
         advance();
         return null;
     }
 
     /**
-     * assignStmt → KEYWORD IDENTIFIER '=' expression ';'
-     * Example:  সংখ্যা বয়স = 20;
+     * assignStmt → ('সংখ্যা'|'লেখা') IDENTIFIER '=' expression ';'
      */
     private AssignmentNode parseAssignment() {
-        String typeName = currentToken().getValue(); // সংখ্যা / লেখা
-        System.out.println("Parsing Assignment... (type: " + typeName + ")");
-        advance(); // type keyword খাও
+        // keyword → declared type
+        String keyword = currentToken().getValue();
+        String declaredType = keyword.equals("সংখ্যা") ? "NUMBER" : "STRING";
+        advance(); // keyword খাও
 
-        Token idToken = consume(TokenType.IDENTIFIER, "Variable name (IDENTIFIER) আশা করা হয়েছিল");
+        Token idToken = consume(TokenType.IDENTIFIER,
+            "Variable name (IDENTIFIER) আশা করা হয়েছিল");
         String varName = idToken.getValue();
 
         consume(TokenType.ASSIGN, "'=' আশা করা হয়েছিল");
@@ -131,82 +132,64 @@ public class Parser {
 
         consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল assignment-এর শেষে");
 
-        System.out.println("  → AssignmentNode: " + typeName + " " + varName);
-        return new AssignmentNode(varName, expr);
+        return new AssignmentNode(varName, expr, declaredType);
     }
 
     /**
      * printStmt → 'দেখাও' '(' expression ')' ';'
-     * Example:  দেখাও("প্রাপ্তবয়স্ক");
      */
     private PrintNode parsePrint() {
-        System.out.println("Parsing Print...");
         advance(); // 'দেখাও' খাও
-
         consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল দেখাও-এর পরে");
         ASTNode expr = parseExpression();
         consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল");
         consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল");
-
-        System.out.println("  → PrintNode");
         return new PrintNode(expr);
     }
 
     /**
-     * ifStmt → 'যদি' '(' expression ')' block ( 'নাহলে' block )?
-     * Example:  যদি (বয়স >= 18) { দেখাও("Adult"); } নাহলে { দেখাও("Minor"); }
+     * ifStmt → 'যদি' '(' expression ')' '{' statement* '}'
+     *          ( 'নাহলে' '{' statement* '}' )?
      */
     private IfNode parseIf() {
-        System.out.println("Parsing If...");
         advance(); // 'যদি' খাও
 
         consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল যদি-র পরে");
         ASTNode condition = parseExpression();
         consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল");
 
-        BlockNode thenBlock = parseBlock();
-        System.out.println("  → IfNode condition parsed");
-
-        BlockNode elseBlock = null;
-        if (check(TokenType.KEYWORD) && checkValue("নাহলে")) {
-            System.out.println("Parsing Else...");
-            advance(); // 'নাহলে' খাও
-            elseBlock = parseBlock();
-            System.out.println("  → ElseNode parsed");
-        }
-
-        return new IfNode(condition, thenBlock, elseBlock);
-    }
-
-    /**
-     * block → '{' statement* '}'
-     */
-    private BlockNode parseBlock() {
-        consume(TokenType.LEFT_BRACE, "'{' আশা করা হয়েছিল block-এর শুরুতে");
-
-        BlockNode block = new BlockNode();
+        // then block
+        List<ASTNode> thenBranch = new java.util.ArrayList<>();
+        consume(TokenType.LEFT_BRACE, "'{' আশা করা হয়েছিল");
         while (!check(TokenType.RIGHT_BRACE) && !check(TokenType.EOF)) {
             ASTNode stmt = parseStatement();
-            if (stmt != null) {
-                block.addStatement(stmt);
+            if (stmt != null) thenBranch.add(stmt);
+        }
+        consume(TokenType.RIGHT_BRACE, "'}' আশা করা হয়েছিল");
+
+        // else block (optional)
+        List<ASTNode> elseBranch = new java.util.ArrayList<>();
+        if (check(TokenType.KEYWORD) && checkValue("নাহলে")) {
+            advance(); // 'নাহলে' খাও
+            consume(TokenType.LEFT_BRACE, "'{' আশা করা হয়েছিল নাহলে-র পরে");
+            while (!check(TokenType.RIGHT_BRACE) && !check(TokenType.EOF)) {
+                ASTNode stmt = parseStatement();
+                if (stmt != null) elseBranch.add(stmt);
             }
+            consume(TokenType.RIGHT_BRACE, "'}' আশা করা হয়েছিল");
         }
 
-        consume(TokenType.RIGHT_BRACE, "'}' আশা করা হয়েছিল block-এর শেষে");
-        return block;
+        return new IfNode(condition, thenBranch, elseBranch);
     }
 
     // ─── Expressions (Operator Precedence) ───────────────────────────────────
 
-    /**
-     * expression → comparison
-     */
     private ASTNode parseExpression() {
         return parseComparison();
     }
 
     /**
-     * comparison → addition ( ('==' | '!=' | '<' | '>' | '<=' | '>=') addition )*
+     * comparison → addition ( ('=='|'!='|'<'|'>'|'<='|'>=') addition )*
      */
     private ASTNode parseComparison() {
         ASTNode left = parseAddition();
@@ -223,12 +206,9 @@ public class Parser {
 
     private boolean isComparisonOp() {
         switch (currentToken().getType()) {
-            case EQUAL:
-            case NOT_EQUAL:
-            case LESS:
-            case GREATER:
-            case LESS_EQUAL:
-            case GREATER_EQUAL:
+            case EQUAL: case NOT_EQUAL:
+            case LESS:  case GREATER:
+            case LESS_EQUAL: case GREATER_EQUAL:
                 return true;
             default:
                 return false;
@@ -236,7 +216,7 @@ public class Parser {
     }
 
     /**
-     * addition → multiplication ( ('+' | '-') multiplication )*
+     * addition → multiplication ( ('+'|'-') multiplication )*
      */
     private ASTNode parseAddition() {
         ASTNode left = parseMultiplication();
@@ -252,7 +232,7 @@ public class Parser {
     }
 
     /**
-     * multiplication → primary ( ('*' | '/' | '%') primary )*
+     * multiplication → primary ( ('*'|'/'|'%') primary )*
      */
     private ASTNode parseMultiplication() {
         ASTNode left = parsePrimary();
@@ -289,7 +269,7 @@ public class Parser {
         }
 
         if (tok.getType() == TokenType.LEFT_PAREN) {
-            advance(); // '(' খাও
+            advance();
             ASTNode expr = parseExpression();
             consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল");
             return expr;
