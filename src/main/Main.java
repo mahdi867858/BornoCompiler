@@ -1,5 +1,6 @@
 package main;
 
+import ast.ASTPrinter;
 import ast.ProgramNode;
 import lexer.Lexer;
 import parser.Parser;
@@ -12,37 +13,48 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // ══ Task 3 — IF condition must be BOOLEAN ════════════════════════════
+        // ══ Task 4 — Syntax Error Recovery ═══════════════════════════════════
         System.out.println("════════════════════════════════════════");
-        System.out.println("  Task 3 — IF Condition Type Error");
-        System.out.println("  যদি (বয়স) — বয়স is NUMBER, not BOOLEAN");
+        System.out.println("  Task 4 — Syntax Error Recovery");
+        System.out.println("  প্রথম statement-এ ';' নেই");
         System.out.println("════════════════════════════════════════");
 
-        runTest("""
-                সংখ্যা বয়স = 20;
+        String code = """
+                সংখ্যা বয়স = 20
 
-                যদি (বয়স)
-                {
-                    সংখ্যা status = 1;
-                }
-                নাহলে
-                {
-                    সংখ্যা status = 0;
-                }
-                """);
-    }
+                লেখা নাম = "Mahdi";
+                """;
 
-    private static void runTest(String code) {
-        try {
-            List<Token> tokens = new Lexer(code).tokenize();
-            ProgramNode ast    = new Parser(tokens).parseProgram();
-            new SemanticAnalyzer().analyze(ast);
+        System.out.println("Source:");
+        System.out.println(code);
 
-            System.out.println("  ⚠️  কোনো error ধরা পড়েনি!");
+        List<Token> tokens = new Lexer(code).tokenize();
+        Parser parser = new Parser(tokens);
+        ProgramNode ast = parser.parseProgram();
 
-        } catch (RuntimeException e) {
-            System.out.println("  ❌ Compiler Error:");
-            System.out.println("     " + e.getMessage());
+        // Syntax errors দেখাও
+        if (parser.hasErrors()) {
+            System.out.println("⚠️  Syntax Error(s) ধরা পড়েছে:");
+            for (String err : parser.getErrors()) {
+                System.out.println("   " + err);
+            }
+            System.out.println();
+        }
+
+        // AST যা parse হয়েছে তা দেখাও
+        System.out.println("Parsed AST (যতটুকু সম্ভব):");
+        new ASTPrinter().print(ast);
+
+        System.out.println("\nStatements parsed: " + ast.getStatements().size());
+
+        // Valid statement-গুলোতে Semantic Analysis চলবে
+        if (!ast.getStatements().isEmpty()) {
+            System.out.println();
+            try {
+                new SemanticAnalyzer().analyze(ast);
+            } catch (RuntimeException e) {
+                System.out.println("  ❌ Semantic Error: " + e.getMessage());
+            }
         }
     }
 }
