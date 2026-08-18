@@ -44,8 +44,6 @@ public class SemanticAnalyzer {
             analyzeAssignment((AssignmentNode) node, scope);
         } else if (node instanceof IfNode) {
             analyzeIf((IfNode) node, scope);
-        } else if (node instanceof WhileNode) {
-            analyzeWhile((WhileNode) node, scope);
         } else if (node instanceof PrintNode) {
             analyzePrint((PrintNode) node, scope);
         }
@@ -108,22 +106,6 @@ public class SemanticAnalyzer {
         analyzeStatements(node.getThenBranch(), new SymbolTable(scope));
         analyzeStatements(node.getElseBranch(), new SymbolTable(scope));
         System.out.println("  [✔] If statement valid");
-    }
-
-    // ─── While Statement ──────────────────────────────────────────────────────
-
-    private void analyzeWhile(WhileNode node, SymbolTable scope) {
-        Type condType = analyzeExpression(node.getCondition(), scope);
-
-        if (condType != Type.BOOLEAN) {
-            throw new RuntimeException(
-                "[Type Error] WHILE condition-এর type BOOLEAN হতে হবে, পেলাম: " + condType
-            );
-        }
-
-        // Loop body-র নিজস্ব child scope
-        analyzeStatements(node.getBody(), new SymbolTable(scope));
-        System.out.println("  [✔] While statement valid");
     }
 
     // ─── Print Statement ──────────────────────────────────────────────────────
