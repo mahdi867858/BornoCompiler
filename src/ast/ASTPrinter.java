@@ -1,22 +1,49 @@
 package ast;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import token.NumberHelper;
 
 /**
- * ASTPrinter — Compiler-style syntax tree।
- * Format: indented tree with TYPE/NAME/VALUE labels
+ * ASTPrinter — Compiler-style Abstract Syntax Tree printer for Borno Compiler.
+ * Formats tree with TYPE / NAME / VALUE labels in clean hierarchical structure.
  */
 public class ASTPrinter {
 
+    private final PrintStream out;
+
+    public ASTPrinter() {
+        this(System.out);
+    }
+
+    public ASTPrinter(PrintStream out) {
+        this.out = out;
+    }
+
     public void print(ASTNode node) {
-        System.out.println("PROGRAM");
+        out.println("PROGRAM");
+        out.println("│");
         if (node instanceof ProgramNode) {
             List<ASTNode> stmts = ((ProgramNode) node).getStatements();
             for (int i = 0; i < stmts.size(); i++) {
                 boolean last = (i == stmts.size() - 1);
-                printNode(stmts.get(i), "│", last);
+                printNode(stmts.get(i), "", last);
+                if (!last) {
+                    out.println("│");
+                }
             }
+        } else if (node != null) {
+            printNode(node, "", true);
         }
+    }
+
+    public String printToString(ASTNode node) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+        new ASTPrinter(ps).print(node);
+        return baos.toString(StandardCharsets.UTF_8);
     }
 
     private void printNode(ASTNode node, String prefix, boolean isLast) {
@@ -28,39 +55,42 @@ public class ASTPrinter {
 
             if (n.getDeclaredType() != null) {
                 // নতুন declaration
-                System.out.println(prefix + connector + "DECLARATION");
-                System.out.println(childPrefix + "├── TYPE  : " + n.getDeclaredType());
-                System.out.println(childPrefix + "├── NAME  : " + n.getVariableName());
-                System.out.print  (childPrefix + "└── VALUE : ");
+                String typeLabel = "NUMBER".equalsIgnoreCase(n.getDeclaredType()) ? "সংখ্যা" :
+                                   ("STRING".equalsIgnoreCase(n.getDeclaredType()) ? "বাক্য" : n.getDeclaredType());
+
+                out.println(prefix + connector + "DECLARATION");
+                out.println(childPrefix + "├── TYPE  : " + typeLabel);
+                out.println(childPrefix + "├── NAME  : " + n.getVariableName());
+                out.print  (childPrefix + "└── VALUE : ");
                 printInline(n.getExpression());
-                System.out.println();
+                out.println();
             } else {
                 // re-assignment
-                System.out.println(prefix + connector + "ASSIGNMENT");
-                System.out.println(childPrefix + "├── NAME  : " + n.getVariableName());
-                System.out.print  (childPrefix + "└── VALUE : ");
+                out.println(prefix + connector + "ASSIGNMENT");
+                out.println(childPrefix + "├── NAME  : " + n.getVariableName());
+                out.print  (childPrefix + "└── VALUE : ");
                 printInline(n.getExpression());
-                System.out.println();
+                out.println();
             }
 
         } else if (node instanceof PrintNode) {
-            System.out.println(prefix + connector + "PRINT");
-            System.out.print  (childPrefix + "└── EXPR  : ");
+            out.println(prefix + connector + "PRINT");
+            out.print  (childPrefix + "└── EXPR  : ");
             printInline(((PrintNode) node).getExpression());
-            System.out.println();
+            out.println();
 
         } else if (node instanceof IfNode) {
             IfNode n = (IfNode) node;
-            System.out.println(prefix + connector + "IF");
+            out.println(prefix + connector + "IF");
 
             // CONDITION
-            System.out.print(childPrefix + "├── CONDITION : ");
+            out.print(childPrefix + "├── CONDITION : ");
             printInline(n.getCondition());
-            System.out.println();
+            out.println();
 
             // THEN
             boolean hasElse = n.hasElse();
-            System.out.println(childPrefix + (hasElse ? "├── " : "└── ") + "THEN");
+            out.println(childPrefix + (hasElse ? "├── " : "└── ") + "THEN");
             String thenPfx = childPrefix + (hasElse ? "│   " : "    ");
             List<ASTNode> thenBranch = n.getThenBranch();
             for (int i = 0; i < thenBranch.size(); i++) {
@@ -69,36 +99,45 @@ public class ASTPrinter {
 
             // ELSE
             if (hasElse) {
-                System.out.println(childPrefix + "└── ELSE");
+                out.println(childPrefix + "└── ELSE");
                 List<ASTNode> elseBranch = n.getElseBranch();
                 for (int i = 0; i < elseBranch.size(); i++) {
                     printNode(elseBranch.get(i), childPrefix + "    ", i == elseBranch.size() - 1);
                 }
             }
 
-        } else {
-            System.out.println(prefix + connector + node.getClass().getSimpleName());
+        } else if (node != null) {
+            out.println(prefix + connector + node.getClass().getSimpleName());
         }
     }
 
-    /** Expression-কে একলাইনে print করে — যেমন: (বয়স >= 18) */
+    /** Expression-কে একলাইনে print করে — যেমন: (বয়স >= ১৮) */
     private void printInline(ASTNode node) {
         if (node instanceof LiteralNode) {
-            System.out.print(((LiteralNode) node).getValue());
+            String val = ((LiteralNode) node).getValue();
+            if (NumberHelper.isNumber(val)) {
+                out.print(val);
+            } else {
+                if (val.startsWith("\"") && val.endsWith("\"")) {
+                    out.print(val);
+                } else {
+                    out.print("\"" + val + "\"");
+                }
+            }
 
         } else if (node instanceof VariableNode) {
-            System.out.print(((VariableNode) node).getName());
+            out.print(((VariableNode) node).getName());
 
         } else if (node instanceof BinaryExpressionNode) {
             BinaryExpressionNode b = (BinaryExpressionNode) node;
-            System.out.print("(");
+            out.print("(");
             printInline(b.getLeft());
-            System.out.print(" " + b.getOperator() + " ");
+            out.print(" " + b.getOperator() + " ");
             printInline(b.getRight());
-            System.out.print(")");
+            out.print(")");
 
-        } else {
-            System.out.print(node.getClass().getSimpleName());
+        } else if (node != null) {
+            out.print(node.getClass().getSimpleName());
         }
     }
 }
