@@ -37,7 +37,7 @@ public class Parser {
     private int position = 0;
 
     // Error recovery — collect errors, don't crash
-    private final List<String> errors = new ArrayList<>();
+    private final List<String> errors = new ArrayList<>();//here t00
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens != null ? tokens : new ArrayList<>();
