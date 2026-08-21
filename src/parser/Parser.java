@@ -20,7 +20,7 @@ import token.TokenType;
  * Grammar:
  *   program        → statement* EOF
  *   statement      → declareStmt | reassignStmt | printStmt | ifStmt
- *   declareStmt    → ('সংখ্যা'|'লেখা') IDENTIFIER '=' expression ';'
+ *   declareStmt    → ('ধরি')? ('সংখ্যা'|'বাক্য'|'লেখা') IDENTIFIER '=' expression ';'
  *   reassignStmt   → IDENTIFIER '=' expression ';'
  *   printStmt      → 'দেখাও' '(' expression ')' ';'
  *   ifStmt         → 'যদি' '(' expression ')' '{' statement* '}'
@@ -40,7 +40,7 @@ public class Parser {
     private final List<String> errors = new ArrayList<>();
 
     public Parser(List<Token> tokens) {
-        this.tokens = tokens;
+        this.tokens = tokens != null ? tokens : new ArrayList<>();
     }
 
     /** Parsing-এর পরে collected errors */
@@ -55,6 +55,9 @@ public class Parser {
     // ─── Token helpers ────────────────────────────────────────────────────────
 
     private Token currentToken() {
+        if (position >= tokens.size()) {
+            return new Token(TokenType.EOF, "", 0, 0);
+        }
         return tokens.get(position);
     }
 
@@ -87,8 +90,9 @@ public class Parser {
             return tok;
         }
         // Error record করো, null return করো
-        errors.add("[Syntax Error] " + errorMsg +
-                   " — পেলাম: '" + currentToken().getValue() + "'");
+        errors.add("[SYNTAX ERROR]\nলাইন: " + currentToken().getLine() +
+                   "\nকলাম: " + currentToken().getCol() +
+                   "\nসমস্যা: " + errorMsg + " (পেয়েছি: '" + currentToken().getValue() + "')");
         return null; // null = error token
     }
 
@@ -108,12 +112,10 @@ public class Parser {
                 return;
             }
             // নতুন statement-এর keyword পেলে থামো
-            if (check(TokenType.KEYWORD)) {
-                String kw = currentToken().getValue();
-                if (kw.equals("সংখ্যা") || kw.equals("লেখা") ||
-                    kw.equals("যদি")    || kw.equals("দেখাও")) {
-                    return;
-                }
+            TokenType t = currentToken().getType();
+            if (t == TokenType.DHORI || t == TokenType.SONGKHA || t == TokenType.BAKKA ||
+                t == TokenType.JODI || t == TokenType.DEKHAO || t == TokenType.JOTOKKHON) {
+                return;
             }
             advance();
         }
@@ -127,10 +129,12 @@ public class Parser {
         while (!check(TokenType.EOF)) {
             try {
                 ASTNode stmt = parseStatement();
-                if (stmt != null) program.addStatement(stmt);
+                if (stmt != null) {
+                    program.addStatement(stmt);
+                }
             } catch (RuntimeException e) {
                 // Unexpected runtime error — record করো, sync করো
-                errors.add("[Syntax Error] " + e.getMessage());
+                errors.add("[SYNTAX ERROR] " + e.getMessage());
                 synchronize();
             }
         }
@@ -141,54 +145,83 @@ public class Parser {
     // ─── Statements ───────────────────────────────────────────────────────────
 
     private ASTNode parseStatement() {
-        if (check(TokenType.KEYWORD)) {
-            switch (currentToken().getValue()) {
-                case "সংখ্যা":
-                case "লেখা":
-                    return parseDeclare();
+        // ধরি দিয়ে শুরু: ধরি সংখ্যা ক = ১০; / ধরি বাক্য নাম = "মাহদি";
+        if (check(TokenType.DHORI)) {
+            return parseDeclare(true);
+        }
 
-                case "দেখাও":
-                    return parsePrint();
+        // ধরি ছাড়া শুরু: সংখ্যা ক = ১০; / বাক্য নাম = "মাহদি";
+        if (check(TokenType.SONGKHA) || check(TokenType.BAKKA)) {
+            return parseDeclare(false);
+        }
 
-                case "যদি":
-                    return parseIf();
+        // দেখাও: দেখাও(...);
+        if (check(TokenType.DEKHAO)) {
+            return parsePrint();
+        }
 
-                default:
-                    advance();
-                    return null;
-            }
+        // যদি: যদি (...) { }
+        if (check(TokenType.JODI)) {
+            return parseIf();
         }
 
         // IDENTIFIER followed by '=' → re-assignment
-        if (check(TokenType.IDENTIFIER) &&
-            peek(1).getType() == TokenType.ASSIGN) {
+        if (check(TokenType.IDENTIFIER) && peek(1).getType() == TokenType.ASSIGN) {
             return parseReassign();
         }
 
-        advance();
+        // Stray unknown token or unexpected token
+        Token stray = currentToken();
+        if (stray.getType() != TokenType.EOF) {
+            errors.add("[SYNTAX ERROR]\nলাইন: " + stray.getLine() +
+                       "\nকলাম: " + stray.getCol() +
+                       "\nসমস্যা: অপ্রত্যাশিত টোকেন: '" + stray.getValue() + "'");
+            advance();
+        }
         return null;
     }
 
-    // ─── Declaration: সংখ্যা i = 0; ──────────────────────────────────────────
+    // ─── Declaration: [ধরি] সংখ্যা i = 0; ─────────────────────────────────────
 
-    private AssignmentNode parseDeclare() {
-        String keyword      = currentToken().getValue();
-        String declaredType = keyword.equals("সংখ্যা") ? "NUMBER" : "STRING";
-        advance();
+    private AssignmentNode parseDeclare(boolean hasDhori) {
+        if (hasDhori) {
+            advance(); // consume 'ধরি'
+        }
 
-        Token id = consume(TokenType.IDENTIFIER, "Variable name আশা করা হয়েছিল");
-        if (id == null) { synchronize(); return null; }
+        String declaredType;
+        if (check(TokenType.SONGKHA)) {
+            declaredType = "NUMBER";
+            advance();
+        } else if (check(TokenType.BAKKA)) {
+            declaredType = "STRING";
+            advance();
+        } else {
+            errors.add("[SYNTAX ERROR]\nলাইন: " + currentToken().getLine() +
+                       "\nকলাম: " + currentToken().getCol() +
+                       "\nসমস্যা: ধরনের নাম ('সংখ্যা' অথবা 'বাক্য') আশা করা হয়েছিল, কিন্তু পেয়েছি: '" + currentToken().getValue() + "'");
+            synchronize();
+            return null;
+        }
 
-        if (consume(TokenType.ASSIGN, "'=' আশা করা হয়েছিল") == null) {
-            synchronize(); return null;
+        Token id = consume(TokenType.IDENTIFIER, "ভেরিয়েবলের নাম (Identifier) আশা করা হয়েছিল");
+        if (id == null) {
+            synchronize();
+            return null;
+        }
+
+        if (consume(TokenType.ASSIGN, "'=' চিহ্ন আশা করা হয়েছিল") == null) {
+            synchronize();
+            return null;
         }
 
         ASTNode expr = parseExpression();
-        if (expr == null) { synchronize(); return null; }
+        if (expr == null) {
+            synchronize();
+            return null;
+        }
 
         if (consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল declaration-এর শেষে") == null) {
-            // ';' নেই — error already recorded, continue without crash
-            // synchronize করার দরকার নেই কারণ পরের keyword-এ এমনিতেই যাবে
+            // error already recorded, continue
         }
 
         return new AssignmentNode(id.getValue(), expr, declaredType);
@@ -197,17 +230,24 @@ public class Parser {
     // ─── Re-assignment: i = i + 1; ───────────────────────────────────────────
 
     private AssignmentNode parseReassign() {
-        Token id = consume(TokenType.IDENTIFIER, "IDENTIFIER আশা করা হয়েছিল");
-        if (id == null) { synchronize(); return null; }
+        Token id = consume(TokenType.IDENTIFIER, "ভেরিয়েবলের নাম আশা করা হয়েছিল");
+        if (id == null) {
+            synchronize();
+            return null;
+        }
 
-        if (consume(TokenType.ASSIGN, "'=' আশা করা হয়েছিল") == null) {
-            synchronize(); return null;
+        if (consume(TokenType.ASSIGN, "'=' চিহ্ন আশা করা হয়েছিল") == null) {
+            synchronize();
+            return null;
         }
 
         ASTNode expr = parseExpression();
-        if (expr == null) { synchronize(); return null; }
+        if (expr == null) {
+            synchronize();
+            return null;
+        }
 
-        if (consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল") == null) {
+        if (consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল re-assignment-এর শেষে") == null) {
             // error recorded, continue
         }
 
@@ -219,18 +259,23 @@ public class Parser {
     private PrintNode parsePrint() {
         advance(); // 'দেখাও'
 
-        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল") == null) {
-            synchronize(); return null;
+        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল 'দেখাও'-এর পরে") == null) {
+            synchronize();
+            return null;
         }
 
         ASTNode expr = parseExpression();
-        if (expr == null) { synchronize(); return null; }
-
-        if (consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল") == null) {
-            synchronize(); return null;
+        if (expr == null) {
+            synchronize();
+            return null;
         }
 
-        consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল");
+        if (consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল print expression-এর শেষে") == null) {
+            synchronize();
+            return null;
+        }
+
+        consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল print statement-এর শেষে");
         return new PrintNode(expr);
     }
 
@@ -239,25 +284,34 @@ public class Parser {
     private IfNode parseIf() {
         advance(); // 'যদি'
 
-        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল যদি-র পরে") == null) {
-            synchronize(); return null;
+        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল 'যদি'-র পরে") == null) {
+            synchronize();
+            return null;
         }
 
         ASTNode condition = parseExpression();
-        if (condition == null) { synchronize(); return null; }
+        if (condition == null) {
+            synchronize();
+            return null;
+        }
 
-        if (consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল") == null) {
-            synchronize(); return null;
+        if (consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল শর্তের শেষে") == null) {
+            synchronize();
+            return null;
         }
 
         List<ASTNode> thenBranch = parseBlock();
-        if (thenBranch == null) return null;
+        if (thenBranch == null) {
+            thenBranch = new ArrayList<>();
+        }
 
         List<ASTNode> elseBranch = new ArrayList<>();
-        if (check(TokenType.KEYWORD) && checkValue("নাহলে")) {
-            advance();
+        if (check(TokenType.NAHOLE)) {
+            advance(); // 'নাহলে'
             List<ASTNode> eb = parseBlock();
-            if (eb != null) elseBranch = eb;
+            if (eb != null) {
+                elseBranch = eb;
+            }
         }
 
         return new IfNode(condition, thenBranch, elseBranch);
@@ -267,7 +321,8 @@ public class Parser {
 
     private List<ASTNode> parseBlock() {
         if (consume(TokenType.LEFT_BRACE, "'{' আশা করা হয়েছিল block-এর শুরুতে") == null) {
-            synchronize(); return null;
+            synchronize();
+            return new ArrayList<>();
         }
 
         List<ASTNode> stmts = new ArrayList<>();
@@ -276,7 +331,7 @@ public class Parser {
                 ASTNode s = parseStatement();
                 if (s != null) stmts.add(s);
             } catch (RuntimeException e) {
-                errors.add("[Syntax Error] " + e.getMessage());
+                errors.add("[SYNTAX ERROR] " + e.getMessage());
                 synchronize();
             }
         }
@@ -304,11 +359,15 @@ public class Parser {
 
     private boolean isComparisonOp() {
         switch (currentToken().getType()) {
-            case EQUAL: case NOT_EQUAL:
-            case LESS:  case GREATER:
-            case LESS_EQUAL: case GREATER_EQUAL:
+            case EQUAL:
+            case NOT_EQUAL:
+            case LESS:
+            case GREATER:
+            case LESS_EQUAL:
+            case GREATER_EQUAL:
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 
@@ -335,20 +394,30 @@ public class Parser {
     private ASTNode parsePrimary() {
         Token tok = currentToken();
 
-        if (tok.getType() == TokenType.NUMBER)     { advance(); return new LiteralNode(tok.getValue()); }
-        if (tok.getType() == TokenType.STRING)     { advance(); return new LiteralNode(tok.getValue()); }
-        if (tok.getType() == TokenType.IDENTIFIER) { advance(); return new VariableNode(tok.getValue()); }
+        if (tok.getType() == TokenType.NUMBER) {
+            advance();
+            return new LiteralNode(tok.getValue());
+        }
+        if (tok.getType() == TokenType.STRING) {
+            advance();
+            return new LiteralNode(tok.getValue());
+        }
+        if (tok.getType() == TokenType.IDENTIFIER) {
+            advance();
+            return new VariableNode(tok.getValue());
+        }
 
         if (tok.getType() == TokenType.LEFT_PAREN) {
             advance();
             ASTNode expr = parseExpression();
-            consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল");
+            consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল expression-এর শেষে");
             return expr;
         }
 
-        // এখানে crash করি না — error record করি
-        errors.add("[Syntax Error] Unexpected token in expression: '" + tok.getValue() + "'");
-        advance(); // skip করো
+        errors.add("[SYNTAX ERROR]\n라인: " + tok.getLine() +
+                   "\nকলাম: " + tok.getCol() +
+                   "\nসমস্যা: এক্সপ্রেশনের মধ্যে অপ্রত্যাশিত টোকেন: '" + tok.getValue() + "'");
+        advance();
         return new LiteralNode("0"); // placeholder যাতে tree intact থাকে
     }
 }
