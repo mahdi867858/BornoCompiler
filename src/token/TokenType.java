@@ -3,39 +3,46 @@ package token;
 public enum TokenType {
 
     // Keywords
-    KEYWORD,
+    DHORI,          // ধরি
+    SONGKHA,        // সংখ্যা
+    BAKKA,          // বাক্য / লেখা
+    JODI,           // যদি
+    NAHOLE,         // নাহলে
+    JOTOKKHON,      // যতক্ষণ
+    DEKHAO,         // দেখাও
+    EBONG,          // এবং
+    OTHBA,          // অথবা
+    NA,             // না
 
-    // Identifier
+    // Identifiers & Literals
     IDENTIFIER,
-
-    // Literals
     NUMBER,
     STRING,
 
     // Operators
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    MODULO,
+    PLUS,           // +
+    MINUS,          // -
+    MULTIPLY,       // *
+    DIVIDE,         // /
+    MODULO,         // %
 
-    ASSIGN,
+    ASSIGN,         // =
 
-    EQUAL,
-    NOT_EQUAL,
-    LESS,
-    GREATER,
-    LESS_EQUAL,
-    GREATER_EQUAL,
+    EQUAL,          // ==
+    NOT_EQUAL,      // !=
+    LESS,           // <
+    GREATER,        // >
+    LESS_EQUAL,     // <=
+    GREATER_EQUAL,  // >=
 
     // Symbols
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    SEMICOLON,
+    LEFT_PAREN,     // (
+    RIGHT_PAREN,    // )
+    LEFT_BRACE,     // {
+    RIGHT_BRACE,    // }
+    SEMICOLON,      // ;
 
-    // End
+    // End / Unknown
     EOF,
     UNKNOWN
-}
+}
