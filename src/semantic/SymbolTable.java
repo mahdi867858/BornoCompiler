@@ -9,7 +9,7 @@ import java.util.Map;
  * প্রতিটি block এর নিজস্ব scope থাকে।
  * Child scope parent-এর variable দেখতে পারে।
  */
-public class SymbolTable {
+public class SymbolTable { //symboltable
 
     private final Map<String, Type> symbols = new LinkedHashMap<>();
     private final Map<String, Boolean> initialized = new LinkedHashMap<>();
