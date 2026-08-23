@@ -107,7 +107,8 @@ public class Main {
             System.out.println("2. Run Lexer");
             System.out.println("3. Run Parser");
             System.out.println("4. Run Semantic Analyzer");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("5. Run Full Pipeline");
+            System.out.println("6. Back to Main Menu");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -132,11 +133,15 @@ public class Main {
                     runSemanticPhase(DEMO_SOURCE);
                 }
                 case "5" -> {
+                    System.out.println();
+                    runFullPipelinePhase(DEMO_SOURCE);
+                }
+                case "6" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৫ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ৬ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -195,7 +200,8 @@ public class Main {
             System.out.println("2. Run Lexer");
             System.out.println("3. Run Parser");
             System.out.println("4. Run Semantic Analyzer");
-            System.out.println("5. Back");
+            System.out.println("5. Run Full Pipeline");
+            System.out.println("6. Back");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -220,11 +226,15 @@ public class Main {
                     runSemanticPhase(customSource);
                 }
                 case "5" -> {
+                    System.out.println();
+                    runFullPipelinePhase(customSource);
+                }
+                case "6" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৫ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ৬ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -389,6 +399,144 @@ public class Main {
             System.out.println("Semantic Status: ERROR");
         } else {
             System.out.println("Semantic analysis completed successfully.");
+        }
+    }
+
+    /**
+     * Runs the FULL COMPILER PIPELINE sequentially:
+     * 1. Lexical Analysis (Tokens)
+     * 2. Syntax Analysis (AST)
+     * 3. Semantic Analysis (Symbol Table & Type Checks)
+     */
+    static void runFullPipelinePhase(String source) {
+        System.out.println(LINE_HEAVY);
+        System.out.println("     FULL PIPELINE EXECUTION (LEXER -> PARSER -> SEMANTIC)");
+        System.out.println(LINE_HEAVY);
+        System.out.println();
+        printSourceCode(source);
+
+        // -------------------------------------------------------------
+        // PHASE 1: LEXICAL ANALYSIS
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 1: LEXICAL ANALYSIS (লেক্সিক্যাল অ্যানালাইসিস)");
+        System.out.println("============================================================");
+
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.tokenize();
+
+        int totalTokens = 0;
+        for (Token t : tokens) {
+            if (t.getType() == TokenType.EOF) continue;
+            System.out.printf("%-14s : %-16s (লাইন %s)%n",
+                    t.getType(), "'" + t.getValue() + "'", NumberHelper.toBangla(String.valueOf(t.getLine())));
+            totalTokens++;
+        }
+
+        System.out.println();
+        System.out.println("মোট টোকেন: " + NumberHelper.toBangla(String.valueOf(totalTokens)));
+        System.out.println();
+
+        if (lexer.hasErrors()) {
+            System.out.println("Lexer Status: ERROR ✗");
+            System.out.println();
+            for (String err : lexer.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println(LINE_HEAVY);
+            System.out.println("PIPELINE HALTED: Lexical errors detected. Parser and Semantic phases skipped.");
+            System.out.println(LINE_HEAVY);
+            return;
+        } else {
+            System.out.println("Lexer Status: OK ✓");
+        }
+
+        // -------------------------------------------------------------
+        // PHASE 2: SYNTAX ANALYSIS (PARSER)
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 2: SYNTAX ANALYSIS (সিনট্যাক্স অ্যানালাইসিস / AST)");
+        System.out.println("============================================================");
+
+        Parser parser = new Parser(tokens);
+        ProgramNode ast = parser.parseProgram();
+
+        new ASTPrinter().print(ast);
+        System.out.println();
+
+        if (parser.hasErrors()) {
+            System.out.println("Parser Status: ERROR ✗");
+            System.out.println();
+            for (String err : parser.getErrors()) {
+                System.out.println(err);
+                System.out.println();
+            }
+            System.out.println(LINE_HEAVY);
+            System.out.println("PIPELINE HALTED: Syntax errors detected. Semantic phase skipped.");
+            System.out.println(LINE_HEAVY);
+            return;
+        } else {
+            System.out.println("Parser Status: OK ✓");
+        }
+
+        // -------------------------------------------------------------
+        // PHASE 3: SEMANTIC ANALYSIS
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 3: SEMANTIC ANALYSIS (সিম্যান্টিক অ্যানালাইসিস)");
+        System.out.println("============================================================");
+
+        SemanticAnalyzer analyzer = new SemanticAnalyzer();
+        boolean hasSemanticError = false;
+        String errorMessage = null;
+
+        try {
+            analyzer.analyze(ast);
+        } catch (RuntimeException e) {
+            hasSemanticError = true;
+            errorMessage = e.getMessage();
+        }
+
+        Map<String, Type> symbols = analyzer.getAllSymbols();
+        if (!symbols.isEmpty()) {
+            System.out.println("Symbol Table:");
+            System.out.println();
+            System.out.printf("%-10s | %-6s | %-11s%n", "Name", "Type", "Initialized");
+            System.out.println("-----------+--------+------------");
+            for (Map.Entry<String, Type> entry : symbols.entrySet()) {
+                System.out.printf("%-10s | %-6s | হ্যাঁ%n",
+                        entry.getKey(), entry.getValue().toBanglaString());
+            }
+            System.out.println();
+        }
+
+        List<String> checkLogs = analyzer.getCheckLogs();
+        if (!checkLogs.isEmpty()) {
+            for (String log : checkLogs) {
+                System.out.println(log);
+            }
+            System.out.println();
+        }
+
+        if (hasSemanticError) {
+            System.out.println(errorMessage != null ? errorMessage : "[SEMANTIC ERROR] Semantic analysis failed.");
+            System.out.println();
+            System.out.println("Semantic Status: ERROR ✗");
+            System.out.println();
+            System.out.println(LINE_HEAVY);
+            System.out.println("PIPELINE RESULT: COMPILATION FAILED DUE TO SEMANTIC ERRORS ✗");
+            System.out.println(LINE_HEAVY);
+        } else {
+            System.out.println("Semantic analysis completed successfully.");
+            System.out.println("Semantic Status: OK ✓");
+            System.out.println();
+            System.out.println(LINE_HEAVY);
+            System.out.println("PIPELINE RESULT: ALL PHASES COMPLETED SUCCESSFULLY ✓");
+            System.out.println(LINE_HEAVY);
         }
     }
 
