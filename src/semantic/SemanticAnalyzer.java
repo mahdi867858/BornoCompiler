@@ -93,6 +93,7 @@ public class SemanticAnalyzer {
         String varName     = node.getVariableName();
         String declaredStr = node.getDeclaredType(); // "NUMBER" | "STRING" | null
         Type   exprType    = analyzeExpression(node.getExpression(), scope);
+        Object exprVal     = evaluateConstant(node.getExpression(), scope);
 
         if (declaredStr != null) {
             // নতুন declaration: ধরি সংখ্যা ক = ...
@@ -114,7 +115,7 @@ public class SemanticAnalyzer {
                 throw new RuntimeException(err);
             }
 
-            scope.declare(varName, declaredType);
+            scope.declare(varName, declaredType, exprVal);
             allSymbols.put(varName, declaredType);
             checkLogs.add("[✓] " + varName + " → " + declaredType.toBanglaString());
 
@@ -134,6 +135,7 @@ public class SemanticAnalyzer {
                 errors.add(err);
                 throw new RuntimeException(err);
             }
+            scope.setValue(varName, exprVal);
             checkLogs.add("[✓] " + varName + " (পুনঃনির্ধারণ) → " + existingType.toBanglaString());
         }
     }
@@ -174,6 +176,63 @@ public class SemanticAnalyzer {
         checkLogs.add("[✓] PRINT statement valid");
     }
 
+    // ─── Constant Value Evaluation ────────────────────────────────────────────
+
+    public Object evaluateConstant(ASTNode node, SymbolTable scope) {
+        if (node == null) return null;
+
+        if (node instanceof LiteralNode) {
+            String val = ((LiteralNode) node).getValue();
+            if (NumberHelper.isNumber(val)) {
+                return NumberHelper.parseDouble(val);
+            }
+            return val;
+        }
+
+        if (node instanceof VariableNode) {
+            String name = ((VariableNode) node).getName();
+            return scope.getValue(name);
+        }
+
+        if (node instanceof BinaryExpressionNode) {
+            BinaryExpressionNode bin = (BinaryExpressionNode) node;
+            Object leftVal = evaluateConstant(bin.getLeft(), scope);
+            Object rightVal = evaluateConstant(bin.getRight(), scope);
+            String op = bin.getOperator();
+
+            if (op.equals("+")) {
+                if (leftVal instanceof String || rightVal instanceof String) {
+                    if (leftVal != null && rightVal != null) {
+                        return leftVal.toString() + rightVal.toString();
+                    }
+                } else if (leftVal instanceof Double && rightVal instanceof Double) {
+                    return (Double) leftVal + (Double) rightVal;
+                }
+            } else if (op.equals("-")) {
+                if (leftVal instanceof Double && rightVal instanceof Double) {
+                    return (Double) leftVal - (Double) rightVal;
+                }
+            } else if (op.equals("*")) {
+                if (leftVal instanceof Double && rightVal instanceof Double) {
+                    return (Double) leftVal * (Double) rightVal;
+                }
+            } else if (op.equals("/")) {
+                if (leftVal instanceof Double && rightVal instanceof Double) {
+                    if ((Double) rightVal != 0.0) {
+                        return (Double) leftVal / (Double) rightVal;
+                    }
+                }
+            } else if (op.equals("%")) {
+                if (leftVal instanceof Double && rightVal instanceof Double) {
+                    if ((Double) rightVal != 0.0) {
+                        return (Double) leftVal % (Double) rightVal;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     // ─── Expression Type Inference ────────────────────────────────────────────
 
     private Type analyzeExpression(ASTNode node, SymbolTable scope) {
@@ -210,15 +269,13 @@ public class SemanticAnalyzer {
             if (op.equals("+") || op.equals("-") ||
                 op.equals("*") || op.equals("/") || op.equals("%")) {
 
-                // Compile-time division by zero check
+                // Compile-time division by zero check (both literals & known variables/expressions)
                 if (op.equals("/") || op.equals("%")) {
-                    if (bin.getRight() instanceof LiteralNode) {
-                        String val = ((LiteralNode) bin.getRight()).getValue();
-                        if (NumberHelper.isNumber(val) && NumberHelper.parseDouble(val) == 0.0) {
-                            String err = "[SEMANTIC ERROR]\nDivision by zero is not allowed.";
-                            errors.add(err);
-                            throw new RuntimeException(err);
-                        }
+                    Object rightVal = evaluateConstant(bin.getRight(), scope);
+                    if (rightVal instanceof Number && ((Number) rightVal).doubleValue() == 0.0) {
+                        String err = "[SEMANTIC ERROR]\nDivision by zero is not allowed.";
+                        errors.add(err);
+                        throw new RuntimeException(err);
                     }
                 }
 

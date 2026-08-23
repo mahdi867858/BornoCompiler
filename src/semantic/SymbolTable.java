@@ -13,6 +13,7 @@ public class SymbolTable { //symboltable
 
     private final Map<String, Type> symbols = new LinkedHashMap<>();
     private final Map<String, Boolean> initialized = new LinkedHashMap<>();
+    private final Map<String, Object> values = new LinkedHashMap<>();
     private final SymbolTable parent; // null হলে global scope
 
     // Global scope (কোনো parent নেই)
@@ -30,11 +31,38 @@ public class SymbolTable { //symboltable
      * একই scope-এ duplicate হলে error।
      */
     public void declare(String name, Type type) {
+        declare(name, type, null);
+    }
+
+    public void declare(String name, Type type, Object value) {
         if (symbols.containsKey(name)) {
             throw new RuntimeException("Duplicate variable declaration: '" + name + "'");
         }
         symbols.put(name, type);
         initialized.put(name, true);
+        if (value != null) {
+            values.put(name, value);
+        }
+    }
+
+    public void setValue(String name, Object value) {
+        if (symbols.containsKey(name)) {
+            if (value != null) {
+                values.put(name, value);
+            } else {
+                values.remove(name);
+            }
+            return;
+        }
+        if (parent != null) {
+            parent.setValue(name, value);
+        }
+    }
+
+    public Object getValue(String name) {
+        if (symbols.containsKey(name)) return values.get(name);
+        if (parent != null) return parent.getValue(name);
+        return null;
     }
 
     /**
