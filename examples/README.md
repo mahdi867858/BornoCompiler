@@ -4,11 +4,15 @@
 
 ---
 
-## ১. বৈধ প্রোগ্রাম টেস্ট (Valid Programs — Expected: SUCCESS)
+## ১. বৈধ প্রোগ্রাম ও অপারেটর প্রিসিডেন্স টেস্ট (Valid & Operator Precedence — Expected: SUCCESS)
 
 | ফাইল নাম | বিবরণ |
 | :--- | :--- |
 | `valid_basic_declaration.brn` | সংখ্যা ও বাক্য ভ্যারিয়েবল ডিক্লেয়ারেশন ও অ্যাসাইনমেন্ট। |
+| `valid_precedence_basic.brn` | যোগ/বিয়োগের তুলনায় গুণ/ভাগের অগ্রাধিকার (`২ + ৩ * ৪ = ১৪`)। |
+| `valid_precedence_parentheses.brn` | বন্ধনী `( )` ব্যবহার করে ডিফল্ট প্রিসিডেন্স পরিবর্তন (`(২ + ৩) * ৪ = ২০`)। |
+| `valid_precedence_mixed_operators.brn` | ভাগশেষ (`%`), গুণ (`*`), যোগ ও বিয়োগের মিশ্র প্রিসিডেন্স টেস্ট। |
+| `valid_precedence_relational.brn` | রিলেশনাল বা শর্তমূলক তুলনায় গাণিতিক অগ্রাধিকার (`ক * ২ + ৫ >= খ + ৩`)। |
 | `valid_arithmetic_precedence.brn` | অপারেটর প্রিসিডেন্সসহ জটিল গাণিতিক এক্সপ্রেশন ও প্রিন্ট। |
 | `valid_nested_if_else.brn` | নেস্টেড `যদি-নাহলে` এবং ব্লক স্কোপিং টেস্ট। |
 | `valid_string_concat.brn` | একাধিক স্ট্রিং/বাক্য ভ্যারিয়েবল যোগ (Concatenation) করা। |
