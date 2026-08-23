@@ -1,4 +1,4 @@
-# BornoCompiler 🇧🇩
+# BornoCompiler 
 
 ### A Bangla Programming Language Compiler
 
