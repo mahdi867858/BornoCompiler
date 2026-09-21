@@ -1,5 +1,7 @@
 package main;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -8,16 +10,20 @@ import java.util.Scanner;
 
 import ast.ASTPrinter;
 import ast.ProgramNode;
+import codegen.PythonGenerator;
+import codegen.WasmGenerator;
 import lexer.Lexer;
 import parser.Parser;
 import semantic.SemanticAnalyzer;
 import semantic.Type;
+import tac.TACGenerator;
+import tac.TACProgram;
 import token.NumberHelper;
 import token.Token;
 import token.TokenType;
 
 /**
- * Borno Compiler — Review 1
+ * Borno Compiler Platform — Official Product Release
  *
  * An interactive Java-based compiler driver for the Borno Bangla programming language.
  */
@@ -82,7 +88,7 @@ public class Main {
     static void printMainMenu() {
         System.out.println();
         System.out.println(BOX_TOP);
-        System.out.println("║          BORNO COMPILER — REVIEW 1       ║");
+        System.out.println("║        BORNO COMPILER PLATFORM           ║");
         System.out.println(BOX_BOT);
         System.out.println();
         System.out.println("1. Demo Test Case");
@@ -107,8 +113,11 @@ public class Main {
             System.out.println("2. Run Lexer");
             System.out.println("3. Run Parser");
             System.out.println("4. Run Semantic Analyzer");
-            System.out.println("5. Run Full Pipeline");
-            System.out.println("6. Back to Main Menu");
+            System.out.println("5. Generate Three Address Code (TAC)");
+            System.out.println("6. Generate Python Target Code");
+            System.out.println("7. Generate WebAssembly Target Code (Optional)");
+            System.out.println("8. Run Full Pipeline");
+            System.out.println("9. Back to Main Menu");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -134,14 +143,26 @@ public class Main {
                 }
                 case "5" -> {
                     System.out.println();
-                    runFullPipelinePhase(DEMO_SOURCE);
+                    runTACPhase(DEMO_SOURCE);
                 }
                 case "6" -> {
+                    System.out.println();
+                    runPythonPhase(DEMO_SOURCE);
+                }
+                case "7" -> {
+                    System.out.println();
+                    runWasmPhase(DEMO_SOURCE);
+                }
+                case "8" -> {
+                    System.out.println();
+                    runFullPipelinePhase(DEMO_SOURCE);
+                }
+                case "9" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৬ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ৯ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -200,8 +221,11 @@ public class Main {
             System.out.println("2. Run Lexer");
             System.out.println("3. Run Parser");
             System.out.println("4. Run Semantic Analyzer");
-            System.out.println("5. Run Full Pipeline");
-            System.out.println("6. Back");
+            System.out.println("5. Generate Three Address Code (TAC)");
+            System.out.println("6. Generate Python Target Code");
+            System.out.println("7. Generate WebAssembly Target Code (Optional)");
+            System.out.println("8. Run Full Pipeline");
+            System.out.println("9. Back");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -227,14 +251,26 @@ public class Main {
                 }
                 case "5" -> {
                     System.out.println();
-                    runFullPipelinePhase(customSource);
+                    runTACPhase(customSource);
                 }
                 case "6" -> {
+                    System.out.println();
+                    runPythonPhase(customSource);
+                }
+                case "7" -> {
+                    System.out.println();
+                    runWasmPhase(customSource);
+                }
+                case "8" -> {
+                    System.out.println();
+                    runFullPipelinePhase(customSource);
+                }
+                case "9" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৬ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ৯ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -402,15 +438,202 @@ public class Main {
         }
     }
 
+    /** Runs ONLY the TAC phase (Lexer -> Parser -> Semantic -> TAC) */
+    static void runTACPhase(String source) {
+        printSourceCode(source);
+        System.out.println();
+        System.out.println("THREE ADDRESS CODE (TAC)");
+        System.out.println(LINE_LIGHT);
+
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.tokenize();
+
+        if (lexer.hasErrors()) {
+            System.out.println("[LEXICAL ERROR PREVENTS TAC GENERATION]");
+            for (String err : lexer.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("TAC Status: NOT COMPLETED / BLOCKED BY LEXICAL ERROR");
+            return;
+        }
+
+        Parser parser = new Parser(tokens);
+        ProgramNode ast = parser.parseProgram();
+
+        if (parser.hasErrors()) {
+            System.out.println("[SYNTAX ERROR PREVENTS TAC GENERATION]");
+            for (String err : parser.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("TAC Status: NOT COMPLETED / BLOCKED BY SYNTAX ERROR");
+            return;
+        }
+
+        SemanticAnalyzer analyzer = new SemanticAnalyzer();
+        try {
+            analyzer.analyze(ast);
+        } catch (RuntimeException e) {
+            System.out.println("[SEMANTIC ERROR PREVENTS TAC GENERATION]");
+            System.out.println(e.getMessage());
+            System.out.println();
+            System.out.println("TAC Status: NOT COMPLETED / BLOCKED BY SEMANTIC ERROR");
+            return;
+        }
+
+        TACGenerator tacGen = new TACGenerator();
+        TACProgram tac = tacGen.generate(ast);
+        System.out.print(tac.toString());
+        System.out.println();
+
+        try {
+            File tacFile = TACGenerator.writeToFile(tac, "output/program.tac");
+            System.out.println("Generated: " + tacFile.getPath().replace('\\', '/'));
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.tac: " + e.getMessage());
+        }
+
+        System.out.println("TAC Status: OK");
+    }
+
+    /** Runs ONLY the Python Target Code generation phase */
+    static void runPythonPhase(String source) {
+        printSourceCode(source);
+        System.out.println();
+        System.out.println("PYTHON TARGET CODE");
+        System.out.println(LINE_LIGHT);
+
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.tokenize();
+
+        if (lexer.hasErrors()) {
+            System.out.println("[LEXICAL ERROR PREVENTS PYTHON CODE GENERATION]");
+            for (String err : lexer.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("Python Target Code Status: NOT COMPLETED / BLOCKED BY LEXICAL ERROR");
+            return;
+        }
+
+        Parser parser = new Parser(tokens);
+        ProgramNode ast = parser.parseProgram();
+
+        if (parser.hasErrors()) {
+            System.out.println("[SYNTAX ERROR PREVENTS PYTHON CODE GENERATION]");
+            for (String err : parser.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("Python Target Code Status: NOT COMPLETED / BLOCKED BY SYNTAX ERROR");
+            return;
+        }
+
+        SemanticAnalyzer analyzer = new SemanticAnalyzer();
+        try {
+            analyzer.analyze(ast);
+        } catch (RuntimeException e) {
+            System.out.println("[SEMANTIC ERROR PREVENTS PYTHON CODE GENERATION]");
+            System.out.println(e.getMessage());
+            System.out.println();
+            System.out.println("Python Target Code Status: NOT COMPLETED / BLOCKED BY SEMANTIC ERROR");
+            return;
+        }
+
+        PythonGenerator pyGen = new PythonGenerator();
+        String pythonCode = pyGen.generate(ast);
+        System.out.print(pythonCode);
+        System.out.println();
+
+        try {
+            File pyFile = PythonGenerator.writeToFile(pythonCode, "output/program.py");
+            System.out.println("Generated: " + pyFile.getPath().replace('\\', '/'));
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.py: " + e.getMessage());
+        }
+
+        System.out.println("Python Target Code Status: OK");
+    }
+
+    /** Runs ONLY the WebAssembly Target Code generation phase */
+    static void runWasmPhase(String source) {
+        printSourceCode(source);
+        System.out.println();
+        System.out.println("WEBASSEMBLY TARGET CODE (.wat)");
+        System.out.println(LINE_LIGHT);
+
+        Lexer lexer = new Lexer(source);
+        List<Token> tokens = lexer.tokenize();
+
+        if (lexer.hasErrors()) {
+            System.out.println("[LEXICAL ERROR PREVENTS WEBASSEMBLY CODE GENERATION]");
+            for (String err : lexer.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("WebAssembly Target Code Status: NOT COMPLETED / BLOCKED BY LEXICAL ERROR");
+            return;
+        }
+
+        Parser parser = new Parser(tokens);
+        ProgramNode ast = parser.parseProgram();
+
+        if (parser.hasErrors()) {
+            System.out.println("[SYNTAX ERROR PREVENTS WEBASSEMBLY CODE GENERATION]");
+            for (String err : parser.getErrors()) {
+                System.out.println(err);
+            }
+            System.out.println();
+            System.out.println("WebAssembly Target Code Status: NOT COMPLETED / BLOCKED BY SYNTAX ERROR");
+            return;
+        }
+
+        SemanticAnalyzer analyzer = new SemanticAnalyzer();
+        try {
+            analyzer.analyze(ast);
+        } catch (RuntimeException e) {
+            System.out.println("[SEMANTIC ERROR PREVENTS WEBASSEMBLY CODE GENERATION]");
+            System.out.println(e.getMessage());
+            System.out.println();
+            System.out.println("WebAssembly Target Code Status: NOT COMPLETED / BLOCKED BY SEMANTIC ERROR");
+            return;
+        }
+
+        WasmGenerator wasmGen = new WasmGenerator();
+        String watCode = wasmGen.generate(ast);
+        System.out.print(watCode);
+        System.out.println();
+
+        try {
+            File watFile = WasmGenerator.writeToFile(watCode, "output/program.wat");
+            System.out.println("Generated: " + watFile.getPath().replace('\\', '/'));
+
+            boolean wasmOk = WasmGenerator.compileWatToWasm("output/program.wat", "output/program.wasm");
+            if (wasmOk) {
+                System.out.println("Compiled: output/program.wasm (via wat2wasm)");
+            } else {
+                System.out.println("[Optional WASM Binary]: wat2wasm tool not installed or skipped; .wat output generated successfully.");
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.wat: " + e.getMessage());
+        }
+
+        System.out.println("WebAssembly Target Code Status: OK");
+    }
+
     /**
      * Runs the FULL COMPILER PIPELINE sequentially:
      * 1. Lexical Analysis (Tokens)
      * 2. Syntax Analysis (AST)
      * 3. Semantic Analysis (Symbol Table & Type Checks)
+     * 4. Three Address Code Generation (TAC)
+     * 5. Python Target Code Generation
+     * 6. WebAssembly Target Code Generation
      */
     static void runFullPipelinePhase(String source) {
         System.out.println(LINE_HEAVY);
-        System.out.println("     FULL PIPELINE EXECUTION (LEXER -> PARSER -> SEMANTIC)");
+        System.out.println("     FULL PIPELINE EXECUTION (LEXER -> PARSER -> SEMANTIC -> TAC -> PYTHON -> WASM)");
         System.out.println(LINE_HEAVY);
         System.out.println();
         printSourceCode(source);
@@ -446,7 +669,11 @@ public class Main {
             }
             System.out.println();
             System.out.println(LINE_HEAVY);
-            System.out.println("PIPELINE HALTED: Lexical errors detected. Parser and Semantic phases skipped.");
+            System.out.println("PIPELINE HALTED: Lexical errors detected. Later phases skipped.");
+            System.out.println(LINE_HEAVY);
+            System.out.println();
+            System.out.println("========== FULL PIPELINE RESULT ==========");
+            System.out.println("Status: ERROR (Failed at Lexical Analysis ✗)");
             System.out.println(LINE_HEAVY);
             return;
         } else {
@@ -475,7 +702,11 @@ public class Main {
                 System.out.println();
             }
             System.out.println(LINE_HEAVY);
-            System.out.println("PIPELINE HALTED: Syntax errors detected. Semantic phase skipped.");
+            System.out.println("PIPELINE HALTED: Syntax errors detected. Later phases skipped.");
+            System.out.println(LINE_HEAVY);
+            System.out.println();
+            System.out.println("========== FULL PIPELINE RESULT ==========");
+            System.out.println("Status: ERROR (Failed at Syntax Analysis ✗)");
             System.out.println(LINE_HEAVY);
             return;
         } else {
@@ -528,16 +759,97 @@ public class Main {
             System.out.println("Semantic Status: ERROR ✗");
             System.out.println();
             System.out.println(LINE_HEAVY);
-            System.out.println("PIPELINE RESULT: COMPILATION FAILED DUE TO SEMANTIC ERRORS ✗");
+            System.out.println("PIPELINE HALTED: Semantic errors detected. Code generation phases skipped.");
             System.out.println(LINE_HEAVY);
+            System.out.println();
+            System.out.println("========== FULL PIPELINE RESULT ==========");
+            System.out.println("Status: ERROR (Failed at Semantic Analysis ✗)");
+            System.out.println(LINE_HEAVY);
+            return;
         } else {
             System.out.println("Semantic analysis completed successfully.");
             System.out.println("Semantic Status: OK ✓");
-            System.out.println();
-            System.out.println(LINE_HEAVY);
-            System.out.println("PIPELINE RESULT: ALL PHASES COMPLETED SUCCESSFULLY ✓");
-            System.out.println(LINE_HEAVY);
         }
+
+        // -------------------------------------------------------------
+        // PHASE 4: THREE ADDRESS CODE (TAC) GENERATION
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 4: THREE ADDRESS CODE (TAC) (ইন্টারমিডিয়েট কোড)");
+        System.out.println("============================================================");
+
+        TACGenerator tacGen = new TACGenerator();
+        TACProgram tac = tacGen.generate(ast);
+        System.out.print(tac.toString());
+        System.out.println();
+
+        try {
+            File tacFile = TACGenerator.writeToFile(tac, "output/program.tac");
+            System.out.println("Generated: " + tacFile.getPath().replace('\\', '/'));
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.tac: " + e.getMessage());
+        }
+        System.out.println("TAC Status: OK ✓");
+
+        // -------------------------------------------------------------
+        // PHASE 5: PYTHON TARGET CODE GENERATION
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 5: PYTHON TARGET CODE (পাইথন টার্গেট কোড)");
+        System.out.println("============================================================");
+
+        PythonGenerator pyGen = new PythonGenerator();
+        String pyCode = pyGen.generate(ast);
+        System.out.print(pyCode);
+        System.out.println();
+
+        try {
+            File pyFile = PythonGenerator.writeToFile(pyCode, "output/program.py");
+            System.out.println("Generated: " + pyFile.getPath().replace('\\', '/'));
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.py: " + e.getMessage());
+        }
+        System.out.println("Python Status: OK ✓");
+
+        // -------------------------------------------------------------
+        // PHASE 6: WEBASSEMBLY TARGET CODE GENERATION
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println("============================================================");
+        System.out.println("PHASE 6: WEBASSEMBLY TARGET CODE (.wat) (ওয়েবঅ্যাসেম্বলি)");
+        System.out.println("============================================================");
+
+        WasmGenerator wasmGen = new WasmGenerator();
+        String watCode = wasmGen.generate(ast);
+        System.out.print(watCode);
+        System.out.println();
+
+        try {
+            File watFile = WasmGenerator.writeToFile(watCode, "output/program.wat");
+            System.out.println("Generated: " + watFile.getPath().replace('\\', '/'));
+
+            boolean wasmOk = WasmGenerator.compileWatToWasm("output/program.wat", "output/program.wasm");
+            if (wasmOk) {
+                System.out.println("Compiled: output/program.wasm (via wat2wasm)");
+            } else {
+                System.out.println("[Optional WASM Binary]: wat2wasm tool not installed or skipped; .wat output generated successfully.");
+            }
+        } catch (IOException e) {
+            System.out.println("Warning: Could not save output/program.wat: " + e.getMessage());
+        }
+        System.out.println("WebAssembly Status: OK ✓");
+
+        // -------------------------------------------------------------
+        // FULL PIPELINE RESULT
+        // -------------------------------------------------------------
+        System.out.println();
+        System.out.println(LINE_HEAVY);
+        System.out.println("========== FULL PIPELINE RESULT ==========");
+        System.out.println("Status: OK");
+        System.out.println("All 6 phases completed successfully ✓");
+        System.out.println(LINE_HEAVY);
     }
 
     // =========================================================================
