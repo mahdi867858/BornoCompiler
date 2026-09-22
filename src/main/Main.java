@@ -72,9 +72,11 @@ public class Main {
                     System.out.println();
                     return;
                 }
+                case "5" -> runGeneratedPython();
+                case "6" -> runGeneratedWasm();
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১, ২, ৩ অথবা ৪ নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ৬ এর মধ্যে নির্বাচন করুন।");
                     System.out.println();
                 }
             }
@@ -95,6 +97,8 @@ public class Main {
         System.out.println("2. Enter Your Own Bangla Code");
         System.out.println("3. Automated Test Suite");
         System.out.println("4. Exit");
+        System.out.println("5. Run Generated Python Program");
+        System.out.println("6. Run Generated WebAssembly Program");
         System.out.println();
     }
 
@@ -117,7 +121,9 @@ public class Main {
             System.out.println("6. Generate Python Target Code");
             System.out.println("7. Generate WebAssembly Target Code (Optional)");
             System.out.println("8. Run Full Pipeline");
-            System.out.println("9. Back to Main Menu");
+            System.out.println("9. Run Generated Python Program");
+            System.out.println("10. Run Generated WebAssembly Program");
+            System.out.println("11. Back to Main Menu");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -158,11 +164,19 @@ public class Main {
                     runFullPipelinePhase(DEMO_SOURCE);
                 }
                 case "9" -> {
+                    System.out.println();
+                    runGeneratedPython();
+                }
+                case "10" -> {
+                    System.out.println();
+                    runGeneratedWasm();
+                }
+                case "11" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৯ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ১১ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -225,7 +239,9 @@ public class Main {
             System.out.println("6. Generate Python Target Code");
             System.out.println("7. Generate WebAssembly Target Code (Optional)");
             System.out.println("8. Run Full Pipeline");
-            System.out.println("9. Back");
+            System.out.println("9. Run Generated Python Program");
+            System.out.println("10. Run Generated WebAssembly Program");
+            System.out.println("11. Back");
             System.out.println();
             System.out.print("Choose: ");
             if (!scanner.hasNextLine()) {
@@ -266,11 +282,19 @@ public class Main {
                     runFullPipelinePhase(customSource);
                 }
                 case "9" -> {
+                    System.out.println();
+                    runGeneratedPython();
+                }
+                case "10" -> {
+                    System.out.println();
+                    runGeneratedWasm();
+                }
+                case "11" -> {
                     return;
                 }
                 default -> {
                     System.out.println();
-                    System.out.println("অনুগ্রহ করে ১ থেকে ৯ এর মধ্যে নির্বাচন করুন।");
+                    System.out.println("অনুগ্রহ করে ১ থেকে ১১ এর মধ্যে নির্বাচন করুন।");
                 }
             }
         }
@@ -541,8 +565,11 @@ public class Main {
             return;
         }
 
+        TACGenerator tacGen = new TACGenerator();
+        TACProgram tac = tacGen.generate(ast);
+
         PythonGenerator pyGen = new PythonGenerator();
-        String pythonCode = pyGen.generate(ast);
+        String pythonCode = pyGen.generate(tac);
         System.out.print(pythonCode);
         System.out.println();
 
@@ -620,6 +647,108 @@ public class Main {
         }
 
         System.out.println("WebAssembly Target Code Status: OK");
+    }
+
+    /** Runs the already-generated Python target code (output/program.py) */
+    static void runGeneratedPython() {
+        System.out.println(LINE_HEAVY);
+        System.out.println("RUN GENERATED PYTHON PROGRAM");
+        System.out.println(LINE_HEAVY);
+
+        File pyFile = new File("output/program.py");
+        if (!pyFile.exists()) {
+            System.out.println();
+            System.out.println("[ERROR] 'output/program.py' পাওয়া যায়নি।");
+            System.out.println("অনুগ্রহ করে প্রথমে পাইথন কোড তৈরি করুন (Generate Python Target Code / Run Full Pipeline)।");
+            System.out.println();
+            return;
+        }
+
+        System.out.println("Running: python " + pyFile.getPath().replace('\\', '/'));
+        System.out.println(LINE_LIGHT);
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder("python", pyFile.getPath());
+            // Inherit standard I/O for interactive keyboard input & direct terminal output
+            pb.inheritIO();
+            Process process = pb.start();
+            int exitCode = process.waitFor();
+
+            System.out.println();
+            System.out.println(LINE_LIGHT);
+            System.out.println("Python Execution Completed (Exit Code: " + exitCode + ")");
+        } catch (IOException e) {
+            System.out.println();
+            System.out.println("[ERROR] Python interpreter ('python') পাওয়া যায়নি বা রান করা যায়নি।");
+            System.out.println("নিশ্চিত করুন যে Python 3 ইনস্টল করা আছে এবং সিস্টেম PATH-এ যুক্ত আছে: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println();
+            System.out.println("[ERROR] Execution interrupted: " + e.getMessage());
+        }
+    }
+
+    /** Runs the already-generated WebAssembly target code if a real runtime is available */
+    static void runGeneratedWasm() {
+        System.out.println(LINE_HEAVY);
+        System.out.println("RUN GENERATED WEBASSEMBLY PROGRAM");
+        System.out.println(LINE_HEAVY);
+
+        File watFile = new File("output/program.wat");
+        File wasmFile = new File("output/program.wasm");
+
+        if (!watFile.exists() && !wasmFile.exists()) {
+            System.out.println();
+            System.out.println("[ERROR] 'output/program.wat' বা 'output/program.wasm' পাওয়া যায়নি।");
+            System.out.println("অনুগ্রহ করে প্রথমে WebAssembly কোড তৈরি করুন (Generate WebAssembly Target Code / Run Full Pipeline)।");
+            System.out.println();
+            return;
+        }
+
+        // Probe for compatible WebAssembly runtimes in the environment without installing anything
+        String[] possibleRuntimes = new String[]{"wasmtime", "wasmer", "wasm-interp"};
+        String availableRuntime = null;
+
+        for (String rt : possibleRuntimes) {
+            try {
+                Process proc = new ProcessBuilder(rt, "--version").start();
+                if (proc.waitFor() == 0) {
+                    availableRuntime = rt;
+                    break;
+                }
+            } catch (Exception ignored) {
+                // Runtime not installed or not in PATH
+            }
+        }
+
+        if (availableRuntime != null && wasmFile.exists()) {
+            System.out.println("Running with " + availableRuntime + ": " + wasmFile.getPath().replace('\\', '/'));
+            System.out.println(LINE_LIGHT);
+            try {
+                ProcessBuilder pb = new ProcessBuilder(availableRuntime, wasmFile.getPath());
+                pb.inheritIO();
+                Process process = pb.start();
+                int exitCode = process.waitFor();
+                System.out.println();
+                System.out.println(LINE_LIGHT);
+                System.out.println("WebAssembly Execution Completed (Exit Code: " + exitCode + ")");
+            } catch (Exception e) {
+                System.out.println();
+                System.out.println("[ERROR] WebAssembly execution failed: " + e.getMessage());
+            }
+        } else {
+            // No usable runtime installed in the environment
+            System.out.println();
+            if (watFile.exists()) {
+                System.out.println("Target WAT file : " + watFile.getPath().replace('\\', '/'));
+            }
+            if (wasmFile.exists()) {
+                System.out.println("Target WASM file: " + wasmFile.getPath().replace('\\', '/'));
+            }
+            System.out.println();
+            System.out.println("[INFO] WebAssembly ফাইলটি সফলভাবে তৈরি করা হয়েছে, কিন্তু CLI থেকে সরাসরি এক্সিকিউট করার মতো কোনো WebAssembly runtime (যেমন: wasmtime, wasmer বা wasm-interp) সিস্টেমে ইনস্টল করা নেই।");
+            System.out.println("WebAssembly ফাইলটি ব্রাউজার এনভায়রনমেন্ট অথবা Node.js/Wasm runtime ব্যবহার করে চালানো যাবে।");
+        }
     }
 
     /**
@@ -801,7 +930,7 @@ public class Main {
         System.out.println("============================================================");
 
         PythonGenerator pyGen = new PythonGenerator();
-        String pyCode = pyGen.generate(ast);
+        String pyCode = pyGen.generate(tac);
         System.out.print(pyCode);
         System.out.println();
 
