@@ -19,6 +19,7 @@ public class WasmGenerator {
     private final Map<String, Integer> stringOffsets = new LinkedHashMap<>();
     private final Map<String, Integer> stringLengths = new LinkedHashMap<>();
     private int currentMemoryOffset = 0;
+    private int loopCounter = 0;
 
     public static class WasmResult {
         public final String watCode;
@@ -37,6 +38,7 @@ public class WasmGenerator {
         stringOffsets.clear();
         stringLengths.clear();
         currentMemoryOffset = 0;
+        loopCounter = 0;
 
         // 1. Scan for variables and string literals
         scanProgram(program);
@@ -122,6 +124,22 @@ public class WasmGenerator {
             }
         } else if (node instanceof BlockNode) {
             for (ASTNode s : ((BlockNode) node).getStatements()) scanNode(s);
+        } else if (node instanceof WhileNode) {
+            WhileNode whileNode = (WhileNode) node;
+            scanNode(whileNode.getCondition());
+            if (whileNode.getBody() != null) {
+                for (ASTNode s : whileNode.getBody()) scanNode(s);
+            }
+        } else if (node instanceof ForNode) {
+            ForNode forNode = (ForNode) node;
+            if (forNode.getInit() != null) scanNode(forNode.getInit());
+            if (forNode.getCondition() != null) scanNode(forNode.getCondition());
+            if (forNode.getUpdate() != null) scanNode(forNode.getUpdate());
+            if (forNode.getBody() != null) {
+                for (ASTNode s : forNode.getBody()) scanNode(s);
+            }
+        } else if (node instanceof UnaryExpressionNode) {
+            scanNode(((UnaryExpressionNode) node).getExpression());
         } else if (node instanceof BinaryExpressionNode) {
             BinaryExpressionNode bin = (BinaryExpressionNode) node;
             scanNode(bin.getLeft());
@@ -198,6 +216,53 @@ public class WasmGenerator {
             for (ASTNode s : block.getStatements()) {
                 generateStatement(s, sb, level);
             }
+
+        } else if (node instanceof WhileNode) {
+            WhileNode whileNode = (WhileNode) node;
+            int loopId = ++loopCounter;
+            sb.append(ind).append(";; যতক্ষণ (condition)\n");
+            sb.append(ind).append("block $while_exit_").append(loopId).append("\n");
+            sb.append(ind).append("  loop $while_loop_").append(loopId).append("\n");
+            generateExpression(whileNode.getCondition(), sb, level + 2);
+            sb.append(ind).append("    i32.eqz\n");
+            sb.append(ind).append("    br_if $while_exit_").append(loopId).append("\n");
+            if (whileNode.getBody() != null) {
+                for (ASTNode s : whileNode.getBody()) {
+                    generateStatement(s, sb, level + 2);
+                }
+            }
+            sb.append(ind).append("    br $while_loop_").append(loopId).append("\n");
+            sb.append(ind).append("  end\n");
+            sb.append(ind).append("end\n");
+
+        } else if (node instanceof ForNode) {
+            ForNode forNode = (ForNode) node;
+            int loopId = ++loopCounter;
+            sb.append(ind).append(";; for (init; condition; update)\n");
+            if (forNode.getInit() != null) {
+                generateStatement(forNode.getInit(), sb, level);
+            }
+            sb.append(ind).append("block $for_exit_").append(loopId).append("\n");
+            sb.append(ind).append("  loop $for_loop_").append(loopId).append("\n");
+            if (forNode.getCondition() != null) {
+                generateExpression(forNode.getCondition(), sb, level + 2);
+                sb.append(ind).append("    i32.eqz\n");
+                sb.append(ind).append("    br_if $for_exit_").append(loopId).append("\n");
+            }
+            if (forNode.getBody() != null) {
+                for (ASTNode s : forNode.getBody()) {
+                    generateStatement(s, sb, level + 2);
+                }
+            }
+            if (forNode.getUpdate() != null) {
+                generateStatement(forNode.getUpdate(), sb, level + 2);
+            }
+            sb.append(ind).append("    br $for_loop_").append(loopId).append("\n");
+            sb.append(ind).append("  end\n");
+            sb.append(ind).append("end\n");
+
+        } else if (node != null) {
+            generateExpression(node, sb, level);
         }
     }
 
@@ -251,6 +316,20 @@ public class WasmGenerator {
                 sb.append(ind).append("local.get ").append(local).append("\n");
             } else {
                 sb.append(ind).append("i32.const 0\n");
+            }
+
+        } else if (node instanceof UnaryExpressionNode) {
+            UnaryExpressionNode un = (UnaryExpressionNode) node;
+            String op = un.getOperator();
+            if (op.equals("-")) {
+                sb.append(ind).append("i32.const 0\n");
+                generateExpression(un.getExpression(), sb, level);
+                sb.append(ind).append("i32.sub\n");
+            } else if (op.equals("+")) {
+                generateExpression(un.getExpression(), sb, level);
+            } else if (op.equals("!") || op.equals("না")) {
+                generateExpression(un.getExpression(), sb, level);
+                sb.append(ind).append("i32.eqz\n");
             }
 
         } else if (node instanceof BinaryExpressionNode) {

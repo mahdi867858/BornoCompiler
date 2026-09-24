@@ -1223,9 +1223,55 @@ public class Main {
                 null
             ),
 
-            // ── Intentional Failure Test (Demonstrating Fail Detection) ─────
             new TestCase(
                 23,
+                "Valid Unary Expression",
+                "ধরি সংখ্যা ক = -৫;\nধরি সংখ্যা খ = -ক + ১০;\nদেখাও(খ);",
+                "Testing unary minus on literal and variable inside expressions.",
+                "No errors — Program compiles successfully",
+                TestExpectation.SUCCESS,
+                null
+            ),
+            new TestCase(
+                24,
+                "Valid While Loop (যতক্ষণ)",
+                "ধরি সংখ্যা ক = ০;\nযতক্ষণ (ক < ৫) {\n    দেখাও(ক);\n    ক = ক + ১;\n}",
+                "Testing while loop with condition and body execution.",
+                "No errors — Program compiles successfully",
+                TestExpectation.SUCCESS,
+                null
+            ),
+            new TestCase(
+                25,
+                "Valid For Loop (for / ফর)",
+                "for (ধরি সংখ্যা ক = ০; ক < ৫; ক = ক + ১) {\n    দেখাও(ক);\n}",
+                "Testing for loop with initialization, condition, and update clauses.",
+                "No errors — Program compiles successfully",
+                TestExpectation.SUCCESS,
+                null
+            ),
+            new TestCase(
+                26,
+                "Valid Nested Loop (While with IF)",
+                "ধরি সংখ্যা ক = ০;\nযতক্ষণ (ক < ৩) {\n    যদি (ক == ১) {\n        দেখাও(ক);\n    }\n    ক = ক + ১;\n}",
+                "Testing control flow with IF condition nested inside WHILE loop.",
+                "No errors — Program compiles successfully",
+                TestExpectation.SUCCESS,
+                null
+            ),
+            new TestCase(
+                27,
+                "Invalid While Condition (Non-Boolean)",
+                "ধরি সংখ্যা ক = ৫;\nযতক্ষণ (ক) {\n    দেখাও(ক);\n}",
+                "Using a non-boolean numeric variable as a WHILE loop condition.",
+                "Semantic Error — WHILE condition-এর type BOOLEAN হতে হবে",
+                TestExpectation.SEMANTIC_ERROR,
+                "WHILE condition-এর type BOOLEAN হতে হবে"
+            ),
+
+            // ── Intentional Failure Test (Demonstrating Fail Detection) ─────
+            new TestCase(
+                28,
                 "Intentional Failure Demo [INTENTIONAL FAILURE TEST]",
                 "ধরি সংখ্যা ফলাফল = ১০ / ২;",
                 "Intentional failure demonstration: valid arithmetic expression tested against an expected division-by-zero error to demonstrate fail reporting.",

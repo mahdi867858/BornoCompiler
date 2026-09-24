@@ -106,6 +106,58 @@ public class ASTPrinter {
                 }
             }
 
+        } else if (node instanceof WhileNode) {
+            WhileNode n = (WhileNode) node;
+            out.println(prefix + connector + "WHILE");
+
+            // CONDITION
+            out.print(childPrefix + "├── CONDITION : ");
+            printInline(n.getCondition());
+            out.println();
+
+            // BODY
+            out.println(childPrefix + "└── BODY");
+            List<ASTNode> body = n.getBody();
+            if (body != null) {
+                for (int i = 0; i < body.size(); i++) {
+                    printNode(body.get(i), childPrefix + "    ", i == body.size() - 1);
+                }
+            }
+
+        } else if (node instanceof ForNode) {
+            ForNode n = (ForNode) node;
+            out.println(prefix + connector + "FOR");
+
+            // INIT
+            if (n.getInit() != null) {
+                out.print(childPrefix + "├── INIT      : ");
+                printInline(n.getInit());
+                out.println();
+            }
+
+            // CONDITION
+            if (n.getCondition() != null) {
+                out.print(childPrefix + "├── CONDITION : ");
+                printInline(n.getCondition());
+                out.println();
+            }
+
+            // UPDATE
+            if (n.getUpdate() != null) {
+                out.print(childPrefix + "├── UPDATE    : ");
+                printInline(n.getUpdate());
+                out.println();
+            }
+
+            // BODY
+            out.println(childPrefix + "└── BODY");
+            List<ASTNode> body = n.getBody();
+            if (body != null) {
+                for (int i = 0; i < body.size(); i++) {
+                    printNode(body.get(i), childPrefix + "    ", i == body.size() - 1);
+                }
+            }
+
         } else if (node != null) {
             out.println(prefix + connector + node.getClass().getSimpleName());
         }
@@ -128,6 +180,12 @@ public class ASTPrinter {
         } else if (node instanceof VariableNode) {
             out.print(((VariableNode) node).getName());
 
+        } else if (node instanceof UnaryExpressionNode) {
+            UnaryExpressionNode u = (UnaryExpressionNode) node;
+            out.print("(" + u.getOperator());
+            printInline(u.getExpression());
+            out.print(")");
+
         } else if (node instanceof BinaryExpressionNode) {
             BinaryExpressionNode b = (BinaryExpressionNode) node;
             out.print("(");
@@ -135,6 +193,11 @@ public class ASTPrinter {
             out.print(" " + b.getOperator() + " ");
             printInline(b.getRight());
             out.print(")");
+
+        } else if (node instanceof AssignmentNode) {
+            AssignmentNode a = (AssignmentNode) node;
+            out.print(a.getVariableName() + " = ");
+            printInline(a.getExpression());
 
         } else if (node != null) {
             out.print(node.getClass().getSimpleName());

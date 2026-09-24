@@ -89,11 +89,61 @@ public class TACGenerator {
 
                 tac.add(TACInstruction.label(endLabel));
             }
+        } else if (node instanceof WhileNode) {
+            WhileNode whileNode = (WhileNode) node;
+            String startLabel = newLabel();
+            String endLabel = newLabel();
+
+            tac.add(TACInstruction.label(startLabel));
+            String condPlace = generateExpression(whileNode.getCondition(), tac);
+            tac.add(TACInstruction.ifFalseGoto(condPlace, endLabel));
+
+            List<ASTNode> body = whileNode.getBody();
+            if (body != null) {
+                for (ASTNode s : body) {
+                    generateStatement(s, tac);
+                }
+            }
+
+            tac.add(TACInstruction.gotoLabel(startLabel));
+            tac.add(TACInstruction.label(endLabel));
+
+        } else if (node instanceof ForNode) {
+            ForNode forNode = (ForNode) node;
+            if (forNode.getInit() != null) {
+                generateStatement(forNode.getInit(), tac);
+            }
+
+            String startLabel = newLabel();
+            String endLabel = newLabel();
+
+            tac.add(TACInstruction.label(startLabel));
+            if (forNode.getCondition() != null) {
+                String condPlace = generateExpression(forNode.getCondition(), tac);
+                tac.add(TACInstruction.ifFalseGoto(condPlace, endLabel));
+            }
+
+            List<ASTNode> body = forNode.getBody();
+            if (body != null) {
+                for (ASTNode s : body) {
+                    generateStatement(s, tac);
+                }
+            }
+
+            if (forNode.getUpdate() != null) {
+                generateStatement(forNode.getUpdate(), tac);
+            }
+
+            tac.add(TACInstruction.gotoLabel(startLabel));
+            tac.add(TACInstruction.label(endLabel));
+
         } else if (node instanceof BlockNode) {
             BlockNode block = (BlockNode) node;
             for (ASTNode s : block.getStatements()) {
                 generateStatement(s, tac);
             }
+        } else if (node != null) {
+            generateExpression(node, tac);
         }
     }
 
@@ -111,6 +161,12 @@ public class TACGenerator {
             }
         } else if (node instanceof VariableNode) {
             return ((VariableNode) node).getName();
+        } else if (node instanceof UnaryExpressionNode) {
+            UnaryExpressionNode unary = (UnaryExpressionNode) node;
+            String operandPlace = generateExpression(unary.getExpression(), tac);
+            String temp = newTemp();
+            tac.add(TACInstruction.unary(temp, unary.getOperator(), operandPlace));
+            return temp;
         } else if (node instanceof BinaryExpressionNode) {
             BinaryExpressionNode bin = (BinaryExpressionNode) node;
             String leftPlace = generateExpression(bin.getLeft(), tac);

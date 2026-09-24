@@ -84,6 +84,10 @@ public class SemanticAnalyzer {
             analyzeIf((IfNode) node, scope);
         } else if (node instanceof PrintNode) {
             analyzePrint((PrintNode) node, scope);
+        } else if (node instanceof WhileNode) {
+            analyzeWhile((WhileNode) node, scope);
+        } else if (node instanceof ForNode) {
+            analyzeFor((ForNode) node, scope);
         }
     }
 
@@ -176,6 +180,59 @@ public class SemanticAnalyzer {
         checkLogs.add("[✓] PRINT statement valid");
     }
 
+    // ─── While Statement ──────────────────────────────────────────────────────
+
+    private void analyzeWhile(WhileNode node, SymbolTable scope) {
+        Type condType = analyzeExpression(node.getCondition(), scope);
+
+        if (condType != Type.BOOLEAN && condType != Type.UNKNOWN) {
+            String err = "[SEMANTIC ERROR]\nWHILE condition-এর type BOOLEAN হতে হবে,\n" +
+                         "কিন্তু পাওয়া গেছে: " + condType.toBanglaString();
+            errors.add(err);
+            throw new RuntimeException(err);
+        }
+
+        checkLogs.add("[✓] WHILE condition → BOOLEAN");
+
+        if (node.getBody() != null && !node.getBody().isEmpty()) {
+            SymbolTable loopScope = new SymbolTable(scope);
+            analyzeStatements(node.getBody(), loopScope);
+            checkLogs.add("[✓] WHILE body scope valid");
+        }
+    }
+
+    // ─── For Statement ────────────────────────────────────────────────────────
+
+    private void analyzeFor(ForNode node, SymbolTable scope) {
+        SymbolTable loopScope = new SymbolTable(scope);
+
+        if (node.getInit() != null) {
+            analyzeStatement(node.getInit(), loopScope);
+            checkLogs.add("[✓] FOR init valid");
+        }
+
+        if (node.getCondition() != null) {
+            Type condType = analyzeExpression(node.getCondition(), loopScope);
+            if (condType != Type.BOOLEAN && condType != Type.UNKNOWN) {
+                String err = "[SEMANTIC ERROR]\nFOR condition-এর type BOOLEAN হতে হবে,\n" +
+                             "কিন্তু পাওয়া গেছে: " + condType.toBanglaString();
+                errors.add(err);
+                throw new RuntimeException(err);
+            }
+            checkLogs.add("[✓] FOR condition → BOOLEAN");
+        }
+
+        if (node.getBody() != null && !node.getBody().isEmpty()) {
+            analyzeStatements(node.getBody(), loopScope);
+            checkLogs.add("[✓] FOR body scope valid");
+        }
+
+        if (node.getUpdate() != null) {
+            analyzeStatement(node.getUpdate(), loopScope);
+            checkLogs.add("[✓] FOR update valid");
+        }
+    }
+
     // ─── Constant Value Evaluation ────────────────────────────────────────────
 
     public Object evaluateConstant(ASTNode node, SymbolTable scope) {
@@ -192,6 +249,19 @@ public class SemanticAnalyzer {
         if (node instanceof VariableNode) {
             String name = ((VariableNode) node).getName();
             return scope.getValue(name);
+        }
+
+        if (node instanceof UnaryExpressionNode) {
+            UnaryExpressionNode un = (UnaryExpressionNode) node;
+            Object val = evaluateConstant(un.getExpression(), scope);
+            String op = un.getOperator();
+            if (op.equals("-") && val instanceof Double) {
+                return -((Double) val);
+            } else if (op.equals("+") && val instanceof Double) {
+                return val;
+            } else if ((op.equals("!") || op.equals("না")) && val instanceof Boolean) {
+                return !((Boolean) val);
+            }
         }
 
         if (node instanceof BinaryExpressionNode) {
@@ -256,6 +326,35 @@ public class SemanticAnalyzer {
                 throw new RuntimeException(err);
             }
             return scope.getType(name);
+        }
+
+        // Unary Expression
+        if (node instanceof UnaryExpressionNode) {
+            UnaryExpressionNode un = (UnaryExpressionNode) node;
+            Type operandType = analyzeExpression(un.getExpression(), scope);
+            String op = un.getOperator();
+
+            if (op.equals("-") || op.equals("+")) {
+                if (operandType != Type.NUMBER && operandType != Type.UNKNOWN) {
+                    String err = "[SEMANTIC ERROR]\nUnary '" + op +
+                                 "' শুধুমাত্র সংখ্যা (NUMBER) এর জন্য প্রযোজ্য। পেলাম: " +
+                                 operandType.toBanglaString();
+                    errors.add(err);
+                    throw new RuntimeException(err);
+                }
+                return Type.NUMBER;
+            }
+
+            if (op.equals("!") || op.equals("না")) {
+                if (operandType != Type.BOOLEAN && operandType != Type.UNKNOWN) {
+                    String err = "[SEMANTIC ERROR]\nUnary '" + op +
+                                 "' শুধুমাত্র বুলিয়ান (BOOLEAN) এর জন্য প্রযোজ্য। পেলাম: " +
+                                 operandType.toBanglaString();
+                    errors.add(err);
+                    throw new RuntimeException(err);
+                }
+                return Type.BOOLEAN;
+            }
         }
 
         // Binary Expression

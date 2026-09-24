@@ -114,7 +114,7 @@ public class Parser {
             // নতুন statement-এর keyword পেলে থামো
             TokenType t = currentToken().getType();
             if (t == TokenType.DHORI || t == TokenType.SONGKHA || t == TokenType.BAKKA ||
-                t == TokenType.JODI || t == TokenType.DEKHAO || t == TokenType.JOTOKKHON) {
+                t == TokenType.JODI || t == TokenType.DEKHAO || t == TokenType.JOTOKKHON || t == TokenType.FOR) {
                 return;
             }
             advance();
@@ -163,6 +163,16 @@ public class Parser {
         // যদি: যদি (...) { }
         if (check(TokenType.JODI)) {
             return parseIf();
+        }
+
+        // যতক্ষণ: যতক্ষণ (...) { }
+        if (check(TokenType.JOTOKKHON)) {
+            return parseWhile();
+        }
+
+        // ফর: ফর (...) { } or for (...) { }
+        if (check(TokenType.FOR)) {
+            return parseFor();
         }
 
         // IDENTIFIER followed by '=' → re-assignment
@@ -317,6 +327,92 @@ public class Parser {
         return new IfNode(condition, thenBranch, elseBranch);
     }
 
+    // ─── While: যতক্ষণ (...) { } ─────────────────────────────────────────────
+
+    private WhileNode parseWhile() {
+        advance(); // 'যতক্ষণ'
+
+        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল 'যতক্ষণ'-এর পরে") == null) {
+            synchronize();
+            return null;
+        }
+
+        ASTNode condition = parseExpression();
+        if (condition == null) {
+            synchronize();
+            return null;
+        }
+
+        if (consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল শর্তের শেষে") == null) {
+            synchronize();
+            return null;
+        }
+
+        List<ASTNode> body = parseBlock();
+        if (body == null) {
+            body = new ArrayList<>();
+        }
+
+        return new WhileNode(condition, body);
+    }
+
+    // ─── For: for (init; condition; update) { } ─────────────────────────────
+
+    private ForNode parseFor() {
+        advance(); // 'for' or 'ফর'
+
+        if (consume(TokenType.LEFT_PAREN, "'(' আশা করা হয়েছিল 'ফর'-এর পরে") == null) {
+            synchronize();
+            return null;
+        }
+
+        // 1. Initialization clause
+        ASTNode init = null;
+        if (!check(TokenType.SEMICOLON)) {
+            if (check(TokenType.DHORI)) {
+                init = parseDeclare(true);
+            } else if (check(TokenType.SONGKHA) || check(TokenType.BAKKA)) {
+                init = parseDeclare(false);
+            } else if (check(TokenType.IDENTIFIER) && peek(1).getType() == TokenType.ASSIGN) {
+                init = parseReassign();
+            } else {
+                init = parseExpression();
+                consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল for init-এর শেষে");
+            }
+        } else {
+            consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল for init-এর স্থানে");
+        }
+
+        // 2. Condition clause
+        ASTNode condition = null;
+        if (!check(TokenType.SEMICOLON)) {
+            condition = parseExpression();
+        }
+        consume(TokenType.SEMICOLON, "';' আশা করা হয়েছিল for condition-এর শেষে");
+
+        // 3. Update clause
+        ASTNode update = null;
+        if (!check(TokenType.RIGHT_PAREN)) {
+            if (check(TokenType.IDENTIFIER) && peek(1).getType() == TokenType.ASSIGN) {
+                Token id = consume(TokenType.IDENTIFIER, "ভেরিয়েবলের নাম আশা করা হয়েছিল");
+                consume(TokenType.ASSIGN, "'=' চিহ্ন আশা করা হয়েছিল");
+                ASTNode expr = parseExpression();
+                update = new AssignmentNode(id != null ? id.getValue() : "", expr, null);
+            } else {
+                update = parseExpression();
+            }
+        }
+        consume(TokenType.RIGHT_PAREN, "')' আশা করা হয়েছিল for হেডার-এর শেষে");
+
+        // 4. Body
+        List<ASTNode> body = parseBlock();
+        if (body == null) {
+            body = new ArrayList<>();
+        }
+
+        return new ForNode(init, condition, update, body);
+    }
+
     // ─── Block: { statement* } ────────────────────────────────────────────────
 
     private List<ASTNode> parseBlock() {
@@ -382,13 +478,23 @@ public class Parser {
     }
 
     private ASTNode parseMultiplication() {
-        ASTNode left = parsePrimary();
+        ASTNode left = parseUnary();
         while (check(TokenType.MULTIPLY) || check(TokenType.DIVIDE) || check(TokenType.MODULO)) {
             String op = currentToken().getValue();
             advance();
-            left = new BinaryExpressionNode(left, op, parsePrimary());
+            left = new BinaryExpressionNode(left, op, parseUnary());
         }
         return left;
+    }
+
+    private ASTNode parseUnary() {
+        if (check(TokenType.MINUS) || check(TokenType.PLUS) || check(TokenType.NA)) {
+            String op = currentToken().getValue();
+            advance();
+            ASTNode operand = parseUnary();
+            return new UnaryExpressionNode(op, operand);
+        }
+        return parsePrimary();
     }
 
     private ASTNode parsePrimary() {

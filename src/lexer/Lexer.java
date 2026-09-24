@@ -125,6 +125,9 @@ public class Lexer {
             advance();
         }
         String value = word.toString();
+        if (value.equals("for")) {
+            return new Token(TokenType.FOR, value, startLine, startCol);
+        }
         errors.add("[LEXICAL ERROR]\n라인: " + startLine + "\nকলাম: " + startCol +
                    "\nসমস্যা: English identifier/keyword '" + value + "' is not allowed. Use Bangla characters.");
         return new Token(TokenType.UNKNOWN, value, startLine, startCol);
@@ -163,6 +166,11 @@ public class Lexer {
                 return new Token(TokenType.NAHOLE, value, startLine, startCol);
             case "যতক্ষণ":
                 return new Token(TokenType.JOTOKKHON, value, startLine, startCol);
+            case "ফর":
+            case "জন্য":
+            case "প্রতি":
+            case "প্রতিটি":
+                return new Token(TokenType.FOR, value, startLine, startCol);
             case "দেখাও":
                 return new Token(TokenType.DEKHAO, value, startLine, startCol);
             case "এবং":
@@ -253,9 +261,7 @@ public class Lexer {
                     advance();
                     return new Token(TokenType.NOT_EQUAL, "!=", tokLine, tokCol);
                 }
-                errors.add("[LEXICAL ERROR]\nলাইন: " + tokLine + "\nকলাম: " + tokCol +
-                           "\nসমস্যা: অপরিচিত ক্যারেক্টার '!' (সম্ভবত '!=' বোঝানো হয়েছে)");
-                return new Token(TokenType.UNKNOWN, "!", tokLine, tokCol);
+                return new Token(TokenType.NA, "!", tokLine, tokCol);
 
             case '<':
                 advance();

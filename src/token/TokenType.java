@@ -9,6 +9,7 @@ public enum TokenType {
     JODI,           // যদি
     NAHOLE,         // নাহলে
     JOTOKKHON,      // যতক্ষণ
+    FOR,            // ফর / জন্য / প্রতি / for
     DEKHAO,         // দেখাও
     EBONG,          // এবং
     OTHBA,          // অথবা

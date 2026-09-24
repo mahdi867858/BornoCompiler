@@ -189,6 +189,37 @@ public class PythonGenerator {
                     i++;
                 }
                 case LABEL -> {
+                    String startLabel = inst.getResult();
+                    int endIndex = findLoopLatch(instructions, i + 1, end, startLabel);
+                    if (endIndex != -1) {
+                        String endLabel = instructions.get(endIndex).getResult();
+                        int condIndex = findIfFalseGoto(instructions, i + 1, endIndex, endLabel);
+                        if (condIndex != -1) {
+                            TACInstruction condInst = instructions.get(condIndex);
+                            String cond = formatOperand(condInst.getArg1());
+
+                            sb.append(ind).append("while True:\n");
+
+                            // Condition computation temps (between start label and ifFalse)
+                            if (condIndex > i + 1) {
+                                generateBlock(instructions, i + 1, condIndex, sb, level + 1);
+                            }
+
+                            // Loop termination check
+                            sb.append(ind).append("    if not (").append(cond).append("):\n");
+                            sb.append(ind).append("        break\n");
+
+                            // Loop body and update (between ifFalse and goto startLabel)
+                            if (condIndex + 1 >= endIndex - 1) {
+                                sb.append(ind).append("    pass\n");
+                            } else {
+                                generateBlock(instructions, condIndex + 1, endIndex - 1, sb, level + 1);
+                            }
+
+                            i = endIndex + 1;
+                            break;
+                        }
+                    }
                     sb.append(ind).append("# Label: ").append(inst.getResult()).append("\n");
                     i++;
                 }
@@ -197,6 +228,38 @@ public class PythonGenerator {
         }
 
         return i;
+    }
+
+    /**
+     * Finds the loop latch instruction (GOTO startLabel immediately before an end LABEL)
+     * and returns the index of the end LABEL.
+     */
+    private int findLoopLatch(List<TACInstruction> instructions, int start, int end, String startLabel) {
+        if (startLabel == null) return -1;
+        for (int k = start + 1; k < end; k++) {
+            TACInstruction prev = instructions.get(k - 1);
+            TACInstruction curr = instructions.get(k);
+            if (prev.getOpType() == TACInstruction.OpType.GOTO
+                    && startLabel.equals(prev.getResult())
+                    && curr.getOpType() == TACInstruction.OpType.LABEL) {
+                return k;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Finds an IF_FALSE_GOTO instruction targeting targetLabel in the given range.
+     */
+    private int findIfFalseGoto(List<TACInstruction> instructions, int start, int end, String targetLabel) {
+        if (targetLabel == null) return -1;
+        for (int j = start; j < end; j++) {
+            TACInstruction inst = instructions.get(j);
+            if (inst.getOpType() == TACInstruction.OpType.IF_FALSE_GOTO && targetLabel.equals(inst.getResult())) {
+                return j;
+            }
+        }
+        return -1;
     }
 
     /**

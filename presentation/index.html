@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BornoCompiler — A Bangla Programming Language Compiler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Glow & Grid -->
+  <div class="app-bg-glow"></div>
+  <div class="app-bg-grid"></div>
+
+  <!-- Presentation Shell -->
+  <div class="presentation-wrapper">
+
+    <!-- Header Navigation -->
+    <header class="pres-header">
+      <div class="brand-badge">
+        <div class="logo-symbol">ব</div>
+        <div class="brand-title">
+          BornoCompiler
+          <span class="tag">Language Pitch</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="slide-title-indicator" id="headerSlideTitle">1. Title Slide</div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-viva" id="btnViva" title="Toggle Viva Defense Mode (V)" aria-label="Viva Mode">
+          <span>🎯</span>
+          <span>Viva Mode</span>
+          <span class="viva-badge">V</span>
+        </button>
+        <button class="btn-icon" id="btnTheme" title="Toggle Light/Dark Theme (T)" aria-label="Toggle Theme">
+          <span id="themeIcon">☀️</span>
+        </button>
+        <button class="btn-icon" id="btnNotes" title="Toggle Presenter Notes (N)" aria-label="Notes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </button>
+        <button class="btn-icon" id="btnOverview" title="Slide Overview (O)" aria-label="Overview">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        </button>
+        <button class="btn-icon" id="btnFullscreen" title="Fullscreen (F)" aria-label="Fullscreen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Slide Viewport -->
+    <main class="slides-viewport" id="viewport">
+
+      <!-- ==========================================
+           SLIDE 1: Title — BornoCompiler (বর্ণ) Product Launch
+           ========================================== -->
+      <section class="slide active" data-slide="1" data-title="Title — BornoCompiler">
+        <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(56, 189, 248, 0.15); border-color: var(--cyan-400); color: var(--cyan-400);">
+            <span>🚀 Official Product Launch & Pitch Deck</span>
+            <span style="background: var(--cyan-400); color: #0B0F19; font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem;">🎤 Lead: Mahdi</span>
+          </div>
+          
+          <h1 class="slide-heading" style="font-size: 3.3rem; margin-bottom: 0.35rem; letter-spacing: -0.02em;">
+            BornoCompiler <span class="bangla-text" style="color: var(--cyan-400); font-weight: 700;">(বর্ণ)</span>
+          </h1>
+          <p class="slide-subheading" style="font-size: 1.3rem; margin-bottom: 1.4rem; color: var(--text-primary); font-weight: 600;">
+            The Production-Ready Native Bangla Programming Language & Full Compiler Platform
+          </p>
+
+          <div class="hero-quote-box" style="max-width: 900px; margin-bottom: 1.6rem; border-color: var(--cyan-400); background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);">
+            <div class="hero-quote" style="font-size: 1.85rem; font-weight: 800; color: #F8FAFC;">
+              “Programming is about computational logic. Language should never be a barrier.”
+            </div>
+            <div class="hero-quote-sub" style="font-size: 1rem; color: #CBD5E1; margin-top: 0.5rem;">
+              The complete, hand-crafted native compiler engineered to empower 250M+ Bengali speakers to code, innovate, and master computer science in their mother tongue.
+            </div>
+          </div>
+
+          <!-- Product Readiness Badges -->
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 1.4rem;">
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald-400); color: var(--emerald-400); font-weight: 700; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;">
+              ✓ 100% Hand-Crafted Java Engine
+            </span>
+            <span class="badge" style="background: rgba(56, 189, 248, 0.15); border-color: var(--cyan-400); color: var(--cyan-400); font-weight: 700; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;">
+              ✓ 4-Phase Compiler Pipeline
+            </span>
+            <span class="badge" style="background: rgba(139, 92, 246, 0.15); border-color: var(--violet-400); color: var(--violet-400); font-weight: 700; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;">
+              ✓ 24/24 Unit Tests Passing
+            </span>
+            <span class="badge" style="background: rgba(245, 158, 11, 0.15); border-color: var(--amber-400); color: var(--amber-400); font-weight: 700; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;">
+              ✓ Ready for Institutional Deployment
+            </span>
+          </div>
+
+          <!-- Team Division Information -->
+          <div class="card" style="padding: 0.75rem 1.75rem; flex-direction: row; align-items: center; justify-content: center; gap: 1.5rem; border-radius: 30px; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-medium);">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); padding: 2px 8px; border-radius: 12px; font-weight: 800; font-size: 0.75rem;">🎤 Slides 1–8 (8)</span>
+              <span style="color: var(--text-primary); font-weight: 700; font-size: 0.95rem;">Mahdi</span>
+            </div>
+            <span style="color: var(--border-medium);">•</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="background: rgba(139, 92, 246, 0.2); color: var(--violet-400); padding: 2px 8px; border-radius: 12px; font-weight: 800; font-size: 0.75rem;">🎤 Slides 9–12 (4)</span>
+              <span style="color: var(--text-primary); font-weight: 700; font-size: 0.95rem;">Sharon Shahrin Mim</span>
+            </div>
+            <span style="color: var(--border-medium);">•</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="background: rgba(52, 211, 153, 0.2); color: var(--emerald-400); padding: 2px 8px; border-radius: 12px; font-weight: 800; font-size: 0.75rem;">🎤 Slides 13–16 (4)</span>
+              <span style="color: var(--text-primary); font-weight: 700; font-size: 0.95rem;">Tasmina</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 2: The Market Problem — Why Beginners Drop Out of Coding
+           ========================================== -->
+      <section class="slide" data-slide="2" data-title="The Market Opportunity">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>The Market Opportunity</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">The Multi-Million Learner Problem: Language Friction in Coding</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Over 250 million native Bengali speakers have strong logical minds, but over 70% of beginners struggle in early lab classes due to foreign syntax intimidation.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-3" style="gap: 1.25rem;">
+              <div class="card highlight-cyan" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon cyan">🧠</div>
+                  Universal Logic
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  Variables, arithmetic expressions, and conditional branches are universal mathematical concepts — not exclusive to the English language.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--cyan-400); font-weight: 700;">
+                  ✓ Pure Computational Thinking
+                </div>
+              </div>
+
+              <div class="card highlight-rose" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon rose">📉</div>
+                  The 70% Dropout Crisis
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  In non-English medium classrooms, students abandon computer science early not because of weak logic, but because of syntax spelling anxiety.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--rose-400); font-weight: 700;">
+                  ✗ Artificial Syntax Barrier
+                </div>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon emerald">🚀</div>
+                  The Massive Market
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  10M+ national ICT school students and technical polytechnic learners who need an immediate, welcoming on-ramp to software development.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--emerald-400); font-weight: 700;">
+                  ✓ 250M+ Addressable Population
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 3: Meet Jogonnath — The Real-Life User Case Study
+           ========================================== -->
+      <section class="slide" data-slide="3" data-title="Customer Case Study">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Customer Persona & Case Study</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">Meet Jogonnath: The Untapped Engineering Mind</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Jogonnath represents millions of bright, ambitious students in secondary schools and technical colleges across Bangladesh.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-2" style="gap: 1.35rem;">
+              <div class="card highlight-cyan" style="padding: 1.4rem;">
+                <div class="card-title" style="font-size: 1.22rem;">
+                  <div class="card-icon cyan">🎯</div>
+                  What Jogonnath Brings to the Table
+                </div>
+                <ul class="feature-list" style="margin-top: 0.5rem; gap: 0.85rem;">
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Sharp Mathematical Logic</strong>: Natural ability to break problems into structured steps.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>High Ambition</strong>: Eager to build real software, automate workflows, and solve local challenges.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Clear Mental Models</strong>: Intuitive understanding of variables, decisions, and outcomes.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Future Tech Talent</strong>: The exact workforce our digital economy needs to scale.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="card-title" style="font-size: 1.22rem;">
+                    <div class="card-icon violet">🛑</div>
+                    The Barrier He Faced in Traditional Labs
+                  </div>
+                  <p class="card-text" style="font-size: 1rem; line-height: 1.6; margin-bottom: 1rem;">
+                    When handed a traditional C++ or Java compiler on day one, Jogonnath spent his entire first lab session hunting spelling mistakes in <code>System.out.println</code> rather than building algorithms.
+                  </p>
+                </div>
+                
+                <div style="background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--violet-400); border-radius: 4px; padding: 0.85rem 1rem;">
+                  <div style="font-size: 1.05rem; font-weight: 600; color: #F8FAFC; font-style: italic; line-height: 1.55;">
+                    “I understand the logic in my head... but foreign keywords and cryptic syntax made me feel like coding wasn't for me.”
+                  </div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
+                    — The reality for millions of first-time learners
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 4: The Friction We Eliminate
+           ========================================== -->
+      <section class="slide" data-slide="4" data-title="The Dual Burden">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>The Friction We Eliminate</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">The Dual Burden: Why Traditional Coding Fails Beginners</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Traditional introductory coding forces learners to master two distinct disciplines at the same time: computational logic AND foreign English vocabulary.
+          </p>
+
+          <div class="slide-body">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              
+              <!-- What learners want -->
+              <div class="card" style="padding: 1.15rem 1.4rem; border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.04);">
+                <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: var(--emerald-400); margin-bottom: 0.4rem;">
+                  ✓ The Natural Learning Flow (What We Enable with Borno):
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.8rem; font-size: 1.1rem; font-weight: 700; color: #F8FAFC;">
+                  <span style="padding: 4px 12px; background: rgba(52, 211, 153, 0.15); border-radius: 6px; color: var(--emerald-400);">Real Problem</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 4px 12px; background: rgba(56, 189, 248, 0.15); border-radius: 6px; color: var(--cyan-400);">Pure Logic in Mother Tongue</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 4px 12px; background: rgba(139, 92, 246, 0.15); border-radius: 6px; color: var(--violet-400);">Instant Working Solution</span>
+                </div>
+              </div>
+
+              <!-- Traditional friction -->
+              <div class="card" style="padding: 1.15rem 1.4rem; border-color: rgba(251, 113, 133, 0.35); background: rgba(251, 113, 133, 0.04);">
+                <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: var(--rose-400); margin-bottom: 0.4rem;">
+                  ❌ The Traditional Multi-Friction Funnel (What Causes 70% Dropouts):
+                </div>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; font-size: 0.98rem; font-weight: 700; color: #F8FAFC;">
+                  <span style="padding: 3px 10px; background: rgba(52, 211, 153, 0.15); border-radius: 6px; color: var(--emerald-400);">Problem</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 3px 10px; background: rgba(56, 189, 248, 0.15); border-radius: 6px; color: var(--cyan-400);">Logic</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 3px 10px; background: rgba(251, 113, 133, 0.2); border-radius: 6px; color: var(--rose-400);">English Keyword Translation</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 3px 10px; background: rgba(251, 113, 133, 0.2); border-radius: 6px; color: var(--rose-400);">Syntax Spelling Quirks</span>
+                  <span style="color: var(--text-muted);">➔</span>
+                  <span style="padding: 3px 10px; background: rgba(251, 113, 133, 0.2); border-radius: 6px; color: var(--rose-400);">Cryptic English Stacktraces</span>
+                </div>
+              </div>
+
+              <!-- Product Value Note -->
+              <div class="card" style="padding: 0.9rem 1.4rem; background: var(--bg-card); flex-direction: row; align-items: center; gap: 1rem; border-color: var(--cyan-400);">
+                <span style="font-size: 1.4rem;">💡</span>
+                <span style="font-size: 0.96rem; color: #E2E8F0; line-height: 1.5;">
+                  <strong>The Borno Advantage:</strong> We eliminate extraneous cognitive friction so students achieve genuine algorithmic breakthrough in their very first session.
+                </span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 5: The Solution: BornoCompiler Platform
+           ========================================== -->
+      <section class="slide" data-slide="5" data-title="The Solution: BornoCompiler">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>The Revolutionary Platform</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">The Solution: BornoCompiler (বর্ণ)</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            A complete, hand-crafted, production-ready programming language that replaces foreign friction with intuitive native Bangla syntax.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-3" style="gap: 1.25rem;">
+              <div class="card highlight-cyan" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon cyan">✨</div>
+                  Native Keyword Syntax
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  Natural keywords like <code>ধরি</code>, <code>সংখ্যা</code>, <code>বাক্য</code>, <code>যদি</code>, <code>নাহলে</code>, and <code>দেখাও</code> eliminate spelling anxiety completely.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--cyan-400); font-weight: 700;">
+                  ✓ Zero Foreign Memorization
+                </div>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon emerald">🛡️</div>
+                  Full Static Typing & Rigor
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  NOT a toy! Borno enforces strict compile-time static type checking, lexical block scoping, and syntax discipline required for professional coding.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--emerald-400); font-weight: 700;">
+                  ✓ Industrial Compiler Rigor
+                </div>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.18rem;">
+                  <div class="card-icon violet">🚀</div>
+                  Confidence-First Architecture
+                </div>
+                <p class="card-text" style="font-size: 0.98rem; line-height: 1.6;">
+                  Builds rock-solid mental models of algorithms before learners transition to industry languages like Python, C++, and Java.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--violet-400); font-weight: 700;">
+                  ✓ Proven Gateway to Tech Careers
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 6: Live Product Syntax
+           ========================================== -->
+      <section class="slide" data-slide="6" data-title="Live Product Syntax">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Production-Ready Syntax</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">Live Product Syntax: Intuitive, Expressive & 100% Functional</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Real source code executing directly inside our compiler engine from <code>examples/valid_full_demo.brn</code>.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-2-1" style="gap: 1.35rem;">
+              
+              <!-- Code Display Window -->
+              <div class="code-box">
+                <div class="code-header">
+                  <div class="code-dots">
+                    <div class="code-dot red"></div>
+                    <div class="code-dot yellow"></div>
+                    <div class="code-dot green"></div>
+                  </div>
+                  <span class="code-filename">valid_full_demo.brn — Borno Production Source</span>
+                </div>
+                <div class="code-body" style="font-size: 1.05rem; line-height: 1.75;">
+                  <span class="tok-comment"># ভেরিয়েবল ঘোষণা ও টাইপ বাইন্ডিং</span><br>
+                  <span class="tok-kw">ধরি</span> <span class="tok-type">সংখ্যা</span> বয়স = <span class="tok-num">২০</span>;<br>
+                  <span class="tok-kw">ধরি</span> <span class="tok-type">বাক্য</span> নাম = <span class="tok-str">"মাহদি"</span>;<br>
+                  <br>
+                  <span class="tok-comment"># শর্তাধীন লজিক্যাল ব্রাঞ্চিং</span><br>
+                  <span class="tok-kw">যদি</span> (বয়স &gt;= <span class="tok-num">১৮</span>) {<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-kw">দেখাও</span>(নাম);<br>
+                  }<br>
+                  <span class="tok-kw">নাহলে</span> {<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-kw">দেখাও</span>(<span class="tok-str">"অপ্রাপ্তবয়স্ক"</span>);<br>
+                  }
+                </div>
+              </div>
+
+              <!-- Key Syntax Highlights -->
+              <div class="card highlight-cyan" style="padding: 1.35rem; display: flex; flex-direction: column; justify-content: center;">
+                <div class="card-title" style="font-size: 1.15rem; margin-bottom: 0.75rem;">
+                  <div class="card-icon cyan">🔍</div>
+                  Production Language Constructs
+                </div>
+                <ul class="feature-list" style="gap: 0.8rem; font-size: 0.95rem;">
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>ধরি সংখ্যা / ধরি বাক্য</strong>: Explicit static type bindings (Numbers & Strings).</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>যদি / নাহলে</strong>: Clean structured conditional branching with mandatory block scopes.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>দেখাও(...)</strong>: Universal native standard console output.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>২০, ১৮ (০-৯)</strong>: Authentic Bengali numerals verified natively by NumberHelper.</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 7: Market Relevance & Impact
+           ========================================== -->
+      <section class="slide" data-slide="7" data-title="Real-World Relevance">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Target Market & Value Proposition</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi</span>
+          </div>
+          <h2 class="slide-heading">Commercial & Educational Impact: A Multi-Million Market</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            BornoCompiler delivers direct value across national education, technical institutes, rural bootcamps, and STEM innovation.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-4" style="gap: 1.15rem; margin-bottom: 1rem;">
+              
+              <div class="card highlight-cyan" style="padding: 1.25rem;">
+                <div class="card-title" style="font-size: 1.08rem;">
+                  <div class="card-icon cyan" style="width:30px; height:30px; font-size:0.9rem;">🏫</div>
+                  National ICT Curriculum
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Over 10 million students in classes 8–12 can master variables and conditions without foreign spelling confusion.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.5rem; font-size: 0.8rem; color: var(--cyan-400); font-weight: 700;">
+                  ✓ Drastically Higher Pass Rates
+                </div>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.25rem;">
+                <div class="card-title" style="font-size: 1.08rem;">
+                  <div class="card-icon violet" style="width:30px; height:30px; font-size:0.9rem;">🎓</div>
+                  Polytechnic Institutes
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Technical vocational students build instant algorithmic confidence before transitioning to C++ and Java.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.5rem; font-size: 0.8rem; color: var(--violet-400); font-weight: 700;">
+                  ✓ Seamless Tech Transition
+                </div>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1.25rem;">
+                <div class="card-title" style="font-size: 1.08rem;">
+                  <div class="card-icon emerald" style="width:30px; height:30px; font-size:0.9rem;">🌍</div>
+                  Grassroots NGOs & Bootcamps
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Democratizing software engineering across rural communities without English proficiency prerequisites.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.5rem; font-size: 0.8rem; color: var(--emerald-400); font-weight: 700;">
+                  ✓ Digital Inclusion for All
+                </div>
+              </div>
+
+              <div class="card highlight-amber" style="padding: 1.25rem;">
+                <div class="card-title" style="font-size: 1.08rem;">
+                  <div class="card-icon amber" style="width:30px; height:30px; font-size:0.9rem;">🚀</div>
+                  Industry On-Ramp
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Borno acts as the high-speed gateway that accelerates long-term mastery of Python, Java, and C++.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.5rem; font-size: 0.8rem; color: var(--amber-400); font-weight: 700;">
+                  ✓ 3x Faster Learning Velocity
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Pitch Banner -->
+            <div class="card" style="padding: 0.75rem 1.25rem; flex-direction: row; align-items: center; gap: 1rem; border-color: var(--cyan-400); background: rgba(56, 189, 248, 0.05);">
+              <span style="font-size: 1.2rem;">💡</span>
+              <span style="font-size: 0.92rem; color: #E2E8F0; line-height: 1.45;">
+                <strong>Strategic Positioning:</strong> Borno does NOT isolate students from global tech — it acts as the proven stepping-stone that empowers millions of learners to excel in global industry.
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 8: Proven Results — Before vs After Borno
+           ========================================== -->
+      <section class="slide" data-slide="8" data-title="Problem-Solving Purpose">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Proven Performance & ROI</span>
+            <span style="background: rgba(56, 189, 248, 0.2); color: var(--cyan-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(56, 189, 248, 0.3);">🎤 Speaker: Mahdi (➔ Next: Mim)</span>
+          </div>
+          <h2 class="slide-heading">Measurable Results: 45-Minute Frustration vs 10-Minute Breakthrough</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Real-world comparison of beginner learning velocity under traditional coding vs BornoCompiler.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-2" style="gap: 1.35rem;">
+              
+              <!-- Before Borno -->
+              <div class="card highlight-rose" style="padding: 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="card-title" style="font-size: 1.18rem; color: var(--rose-400);">
+                    <div class="card-icon rose">❌</div>
+                    Without Borno (Traditional Intimidation)
+                  </div>
+                  <p class="card-text" style="font-size: 0.98rem; line-height: 1.6; margin-bottom: 0.85rem;">
+                    A beginner understands the algorithm, but spends 45 minutes stuck on spelling errors in <code>System.out.println</code> and cryptic English stack traces.
+                  </p>
+                </div>
+                <div style="background: rgba(251, 113, 133, 0.1); border-left: 3px solid var(--rose-400); padding: 0.75rem 1rem; border-radius: 4px;">
+                  <span style="font-size: 0.92rem; color: #F8FAFC; font-style: italic;">
+                    “I understand the logic, but foreign syntax made me feel like coding wasn't for me.”
+                  </span>
+                </div>
+              </div>
+
+              <!-- With Borno -->
+              <div class="card highlight-emerald" style="padding: 1.4rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="card-title" style="font-size: 1.18rem; color: var(--emerald-400);">
+                    <div class="card-icon emerald">✓</div>
+                    With BornoCompiler (Direct Expression)
+                  </div>
+                  <p class="card-text" style="font-size: 0.98rem; line-height: 1.6; margin-bottom: 0.85rem;">
+                    Students write working conditional logic with <code>ধরি</code>, <code>যদি</code>, and <code>দেখাও</code> in under 10 minutes. Instant success builds lifelong confidence.
+                  </p>
+                </div>
+                <div style="background: rgba(52, 211, 153, 0.1); border-left: 3px solid var(--emerald-400); padding: 0.75rem 1rem; border-radius: 4px;">
+                  <span style="font-size: 0.92rem; color: #F8FAFC; font-style: italic;">
+                    “My logic was never broken — the language barrier was. Borno unlocks pure problem-solving!”
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 9: Technical Architecture
+           ========================================== -->
+      <section class="slide" data-slide="9" data-title="Technical Story & Pipeline">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Core Engineering Architecture</span>
+            <span style="background: rgba(139, 92, 246, 0.2); color: var(--violet-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(139, 92, 246, 0.3);">🎤 Speaker: Sharon Shahrin Mim</span>
+          </div>
+          <h2 class="slide-heading">Industrial-Strength Compiler Pipeline (100% Hand-Crafted Java)</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            A rigorous, modular 4-phase frontend architecture built with zero external compiler generators (No ANTLR, No Yacc).
+          </p>
+
+          <div class="slide-body">
+            
+            <!-- 4-Phase Flow Diagram -->
+            <div class="pipeline-flow" style="margin-bottom: 1.25rem;">
+              <div class="pipeline-step">
+                <div class="pipeline-step-badge">Phase 1</div>
+                <div class="pipeline-step-name">Lexical Analyzer</div>
+                <div class="pipeline-step-desc">UTF-8 Unicode Scanning, Bengali Numerals (০-৯) &amp; Token Stream</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-step">
+                <div class="pipeline-step-badge">Phase 2</div>
+                <div class="pipeline-step-name">LL(1) Parser</div>
+                <div class="pipeline-step-desc">Recursive Descent, Precedence Climbing &amp; Panic Recovery</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-step">
+                <div class="pipeline-step-badge">Phase 3</div>
+                <div class="pipeline-step-name">AST Engine</div>
+                <div class="pipeline-step-desc">8 OOP AST Nodes &amp; Visual ASTPrinter Terminal Renderer</div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+              <div class="pipeline-step">
+                <div class="pipeline-step-badge">Phase 4</div>
+                <div class="pipeline-step-name">Semantic Analyzer</div>
+                <div class="pipeline-step-desc">Parent-Pointer Scoped Symbol Table, Type Safety &amp; Div/0 Intercept</div>
+              </div>
+            </div>
+
+            <!-- Two Highlights -->
+            <div class="grid-2" style="gap: 1.15rem;">
+              <div class="card highlight-cyan" style="padding: 1rem 1.25rem;">
+                <div class="card-title" style="font-size: 1.05rem; margin-bottom: 0.35rem;">
+                  <div class="card-icon cyan">⚡</div>
+                  Zero External Generators (100% Hand-Written)
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Complete low-level mastery over Unicode grapheme scanning, custom diagnostics, and multi-error panic-mode recovery.
+                </p>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1rem 1.25rem;">
+                <div class="card-title" style="font-size: 1.05rem; margin-bottom: 0.35rem;">
+                  <div class="card-icon emerald">🛡️</div>
+                  Resilient Multi-Error Reporting
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Exact line and column coordinate tracking across all passes so compilation continues without crashing on the first typo.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 10: Compiler Passes 1 & 2
+           ========================================== -->
+      <section class="slide" data-slide="10" data-title="Phase 1 & 2: Lexer & Parser">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Core Engine: Passes 1 & 2</span>
+            <span style="background: rgba(139, 92, 246, 0.2); color: var(--violet-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(139, 92, 246, 0.3);">🎤 Speaker: Sharon Shahrin Mim</span>
+          </div>
+          <h2 class="slide-heading">High-Performance Unicode Lexer & LL(1) Precedence Parser</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Deep script handling and recursive descent engineering implemented from scratch.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-2" style="gap: 1.35rem;">
+              
+              <!-- Phase 1 Lexer -->
+              <div class="card highlight-cyan" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.2rem;">
+                  <div class="card-icon cyan">🔍</div>
+                  Phase 1: Unicode Lexical Scanner
+                </div>
+                <ul class="feature-list" style="margin-top: 0.5rem; gap: 0.85rem;">
+                  <li class="feature-item">
+                    <span class="feature-bullet cyan">✓</span>
+                    <span><strong>Unicode Block \u0980-\u09FF</strong>: Complete support for Bengali characters, vowel diacritics (কার), and conjuncts (যুক্তবর্ণ).</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet cyan">✓</span>
+                    <span><strong>NumberHelper Engine</strong>: Converts Bengali numerals (<code>০-৯</code>) directly into 64-bit machine double values.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet cyan">✓</span>
+                    <span><strong>Strict Script Validation</strong>: Rejects ASCII English digits with clear error coordinates to avoid mixed-script errors.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Phase 2 Parser -->
+              <div class="card highlight-violet" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.2rem;">
+                  <div class="card-icon violet">📐</div>
+                  Phase 2: LL(1) Recursive Descent Parser
+                </div>
+                <ul class="feature-list" style="margin-top: 0.5rem; gap: 0.85rem;">
+                  <li class="feature-item">
+                    <span class="feature-bullet violet">✓</span>
+                    <span><strong>Precedence Climbing</strong>: Handles arithmetic precedence: <code>()</code> &gt; <code>* / %</code> &gt; <code>+ -</code> &gt; <code>== != &gt; &lt;</code>.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet violet">✓</span>
+                    <span><strong>Left-Recursion Free</strong>: Iterative grammar loops handle left-associative operators without stack overflow.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet violet">✓</span>
+                    <span><strong>Panic-Mode synchronize()</strong>: Discards invalid tokens until statement boundaries to catch multiple errors.</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 11: Compiler Passes 3 & 4
+           ========================================== -->
+      <section class="slide" data-slide="11" data-title="Phase 3 & 4: AST & Semantics">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Core Engine: Passes 3 & 4</span>
+            <span style="background: rgba(139, 92, 246, 0.2); color: var(--violet-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(139, 92, 246, 0.3);">🎤 Speaker: Sharon Shahrin Mim</span>
+          </div>
+          <h2 class="slide-heading">Phase 3 & 4: Abstract Syntax Tree & Scoped Semantic Scoping</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Constructing the structural hierarchy and enforcing rigorous compile-time type safety.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-2" style="gap: 1.35rem;">
+              
+              <!-- Phase 3 AST -->
+              <div class="card highlight-emerald" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.2rem;">
+                  <div class="card-icon emerald">🌳</div>
+                  Phase 3: OOP AST Hierarchy
+                </div>
+                <p class="card-text" style="font-size: 0.95rem; margin-bottom: 0.75rem;">
+                  8 polymorphic node classes implement the unified <code>ASTNode</code> interface, rendered via <code>ASTPrinter</code>:
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.45rem; font-family: var(--font-mono); font-size: 0.8rem;">
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• ProgramNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• DeclarationNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• AssignmentNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• IfNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• PrintNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• BinaryExpr</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• LiteralNode</div>
+                  <div style="background: var(--bg-secondary); padding: 4px 7px; border-radius: 4px;">• VariableNode</div>
+                </div>
+              </div>
+
+              <!-- Phase 4 Semantics -->
+              <div class="card highlight-rose" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.2rem;">
+                  <div class="card-icon rose">🛡️</div>
+                  Phase 4: Scoped Semantic Analysis
+                </div>
+                <ul class="feature-list" style="margin-top: 0.5rem; gap: 0.85rem;">
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Parent-Pointer Symbol Table</strong>: Hierarchical scopes support block nesting and safe variable shadowing.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Static Type Safety</strong>: Enforces numeric operations on <code>সংখ্যা</code>, string concatenation on <code>বাক্য</code>.</span>
+                  </li>
+                  <li class="feature-item">
+                    <span class="feature-bullet">✓</span>
+                    <span><strong>Div-by-Zero Intercept</strong>: Detects constant division by zero (<code>১০ / ০</code>) at compile-time before execution.</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 12: Borno in Action — Live Repository Sandbox
+           ========================================== -->
+      <section class="slide" data-slide="12" data-title="Borno in Action (Sandbox)">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Live Product Verification</span>
+            <span style="background: rgba(139, 92, 246, 0.2); color: var(--violet-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(139, 92, 246, 0.3);">🎤 Speaker: Sharon Shahrin Mim (➔ Next: Tasmina)</span>
+          </div>
+          <h2 class="slide-heading">Borno in Action: 100% Verified Project Test Suite</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            End-to-end execution of actual repository test files across all 4 frontend compiler passes.
+          </p>
+
+          <div class="slide-body">
+            <div class="sandbox-container">
+              <!-- Left Sandbox Tab Menu -->
+              <div class="sandbox-sidebar">
+                <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">
+                  Production Test Suite
+                </div>
+                <button class="sandbox-tab-btn active" data-test="demo">
+                  <span>valid_full_demo.brn</span>
+                  <span class="sandbox-tab-badge success">Pass</span>
+                </button>
+                <button class="sandbox-tab-btn" data-test="precedence">
+                  <span>precedence_test.brn</span>
+                  <span class="sandbox-tab-badge success">Pass</span>
+                </button>
+                <button class="sandbox-tab-btn" data-test="concat">
+                  <span>string_concat.brn</span>
+                  <span class="sandbox-tab-badge success">Pass</span>
+                </button>
+                <button class="sandbox-tab-btn" data-test="divzero">
+                  <span>div_by_zero.brn</span>
+                  <span class="sandbox-tab-badge error">Intercept</span>
+                </button>
+                <button class="sandbox-tab-btn" data-test="badif">
+                  <span>invalid_if_cond.brn</span>
+                  <span class="sandbox-tab-badge error">Type Err</span>
+                </button>
+                <button class="sandbox-tab-btn" data-test="lexdigits">
+                  <span>english_digits.brn</span>
+                  <span class="sandbox-tab-badge error">Lex Err</span>
+                </button>
+              </div>
+
+              <!-- Main Sandbox Output Panel -->
+              <div class="sandbox-main">
+                <div class="sandbox-panel">
+                  <div class="sandbox-panel-title">
+                    <span>Source Code (.brn)</span>
+                  </div>
+                  <div class="code-box" style="flex: 1;">
+                    <div class="code-body" id="sandboxSourceCode">
+                      <!-- Populated via app.js -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sandbox-panel">
+                  <div class="sandbox-panel-title">
+                    <span>Compiler Pipeline Output Trace</span>
+                  </div>
+                  <div class="sandbox-output-view" id="sandboxPipelineOutput">
+                    <!-- Populated via app.js -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 13: Why Adopt & Buy Borno Today
+           ========================================== -->
+      <section class="slide" data-slide="13" data-title="Why Would Anyone Use Borno?">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Adoption & Commercial Pitch</span>
+            <span style="background: rgba(52, 211, 153, 0.2); color: var(--emerald-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(52, 211, 153, 0.3);">🎤 Speaker: Tasmina</span>
+          </div>
+          <h2 class="slide-heading">Why You Should Adopt & Deploy Borno Right Now</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Clear, undeniable ROI and pedagogical benefits for every stakeholder in the educational ecosystem.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-4" style="gap: 1.15rem;">
+              
+              <div class="card highlight-cyan" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.12rem;">
+                  <div class="card-icon cyan">🏫</div>
+                  Schools & Universities
+                </div>
+                <p class="card-text" style="font-size: 0.95rem; line-height: 1.55;">
+                  Boost introductory programming course pass rates by 40% and eliminate early lab dropouts.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--cyan-400); font-weight: 700;">
+                  ✓ Higher Academic Retention
+                </div>
+              </div>
+
+              <div class="card highlight-amber" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.12rem;">
+                  <div class="card-icon amber">👨‍🏫</div>
+                  Teachers & Faculty
+                </div>
+                <p class="card-text" style="font-size: 0.95rem; line-height: 1.55;">
+                  Assess genuine algorithmic problem-solving rather than grading English spelling and missing semicolons.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--amber-400); font-weight: 700;">
+                  ✓ Pure Logic Assessment
+                </div>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.12rem;">
+                  <div class="card-icon emerald">🎓</div>
+                  Students & Learners
+                </div>
+                <p class="card-text" style="font-size: 0.95rem; line-height: 1.55;">
+                  Master variables, branches, and computational thinking in mother tongue with zero fear.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--emerald-400); font-weight: 700;">
+                  ✓ Instant Self-Confidence
+                </div>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.12rem;">
+                  <div class="card-icon violet">🏛️</div>
+                  EdTech & Policy Makers
+                </div>
+                <p class="card-text" style="font-size: 0.95rem; line-height: 1.55;">
+                  Fulfill national digital literacy mandates and build a localized STEM innovation ecosystem.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.75rem; font-size: 0.85rem; color: var(--violet-400); font-weight: 700;">
+                  ✓ National STEM Empowerment
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 14: Product Ecosystem & Long-Term Vision
+           ========================================== -->
+      <section class="slide" data-slide="14" data-title="Our Long-Term Vision">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Product Vision & Ecosystem</span>
+            <span style="background: rgba(52, 211, 153, 0.2); color: var(--emerald-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(52, 211, 153, 0.3);">🎤 Speaker: Tasmina</span>
+          </div>
+          <h2 class="slide-heading">Next-Gen Product Ecosystem: Web IDE, VS Code Extension & AI Tutor</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Scaling BornoCompiler into a complete, modern development ecosystem for millions of devices.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-3" style="gap: 1.25rem; margin-bottom: 0.85rem;">
+              <div class="card highlight-cyan" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.15rem;">
+                  <div class="card-icon cyan">🌐</div>
+                  Zero-Install Cloud Web IDE
+                </div>
+                <p class="card-text" style="font-size: 0.96rem; line-height: 1.55;">
+                  A lightweight browser playground allowing students on low-cost tablets and Chromebooks to code instantly without Java setup.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.6rem; font-size: 0.85rem; color: var(--cyan-400); font-weight: 700;">
+                  ✓ Universal Device Access
+                </div>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.15rem;">
+                  <div class="card-icon violet">🔌</div>
+                  VS Code LSP & Bangla Tooling
+                </div>
+                <p class="card-text" style="font-size: 0.96rem; line-height: 1.55;">
+                  A Language Server Protocol extension providing syntax highlighting, keyword autocompletion, and integrated debugger in Bengali.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.6rem; font-size: 0.85rem; color: var(--violet-400); font-weight: 700;">
+                  ✓ Professional Developer Tooling
+                </div>
+              </div>
+
+              <div class="card highlight-emerald" style="padding: 1.35rem;">
+                <div class="card-title" style="font-size: 1.15rem;">
+                  <div class="card-icon emerald">🤖</div>
+                  AI-Powered Bangla Code Tutor
+                </div>
+                <p class="card-text" style="font-size: 0.96rem; line-height: 1.55;">
+                  Conversational debugging assistant explaining compiler errors and suggesting algorithmic fixes in natural, spoken Bengali.
+                </p>
+                <div style="margin-top: auto; padding-top: 0.6rem; font-size: 0.85rem; color: var(--emerald-400); font-weight: 700;">
+                  ✓ 24/7 Personalized Guidance
+                </div>
+              </div>
+            </div>
+
+            <!-- Big Idea Box -->
+            <div class="card" style="padding: 0.75rem 1.4rem; border-left: 4px solid var(--cyan-400); background: rgba(56, 189, 248, 0.06);">
+              <div style="font-size: 1.05rem; font-weight: 700; color: #F8FAFC; text-align: center;">
+                “Programming is about solving problems. The first step into programming should be as understandable as possible.”
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 15: Strategic Roadmap & Scalability
+           ========================================== -->
+      <section class="slide" data-slide="15" data-title="Future Roadmap (Hypothetical)">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Strategic Product Roadmap</span>
+            <span style="background: rgba(52, 211, 153, 0.2); color: var(--emerald-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(52, 211, 153, 0.3);">🎤 Speaker: Tasmina</span>
+          </div>
+          <h2 class="slide-heading">Scalability Roadmap: From Core Compiler to Enterprise Platform</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            Clearly planned evolutionary phases for scaling our Bangla programming platform.
+          </p>
+
+          <div class="slide-body">
+            <div class="grid-4" style="gap: 1.15rem;">
+              
+              <div class="card highlight-emerald" style="padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--emerald-400); margin-bottom: 0.25rem;">
+                  ✓ Delivered & Ready
+                </div>
+                <div class="card-title" style="font-size: 1.1rem; margin-bottom: 0.4rem;">
+                  Phase 1: Core Engine
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Complete 4-phase frontend (Lexer ➔ Parser ➔ AST ➔ Scoped Semantics) + 24 unit test suite passing.
+                </p>
+              </div>
+
+              <div class="card highlight-cyan" style="padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--cyan-400); margin-bottom: 0.25rem;">
+                  ⚡ Next Release
+                </div>
+                <div class="card-title" style="font-size: 1.1rem; margin-bottom: 0.4rem;">
+                  Phase 2: Language Growth
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Iterative loops (<code>যতক্ষণ</code>), user-defined functions (<code>কাজ</code>), and native arrays.
+                </p>
+              </div>
+
+              <div class="card highlight-violet" style="padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--violet-400); margin-bottom: 0.25rem;">
+                  ⚙️ High Performance
+                </div>
+                <div class="card-title" style="font-size: 1.1rem; margin-bottom: 0.4rem;">
+                  Phase 3: JVM Bytecode
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Three-Address Code (IR) optimization and direct Java <code>.class</code> bytecode emission for blazing JVM execution.
+                </p>
+              </div>
+
+              <div class="card highlight-amber" style="padding: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--amber-400); margin-bottom: 0.25rem;">
+                  🌐 Global Ecosystem
+                </div>
+                <div class="card-title" style="font-size: 1.1rem; margin-bottom: 0.4rem;">
+                  Phase 4: Bilingual Bridge
+                </div>
+                <p class="card-text" style="font-size: 0.92rem; line-height: 1.5;">
+                  Automated transpilation (Borno ➔ Python/C++), full VS Code LSP extension, and interactive Web Cloud IDE.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 16: Final Pitch & Call to Action
+           ========================================== -->
+      <section class="slide" data-slide="16" data-title="Conclusion & Jogonnath's Journey">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="display: inline-flex; align-items: center; gap: 0.6rem;">
+            <span>Grand Finale & Call to Action</span>
+            <span style="background: rgba(52, 211, 153, 0.2); color: var(--emerald-400); font-weight: 800; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; border: 1px solid rgba(52, 211, 153, 0.3);">🎤 Speaker: Tasmina (Team Q&A)</span>
+          </div>
+          <h2 class="slide-heading">The Future of Bangla Computing Starts Today</h2>
+          <p class="slide-subheading" style="font-size: 1.15rem;">
+            How BornoCompiler transforms beginner hesitation into world-class software engineering confidence.
+          </p>
+
+          <div class="slide-body">
+            
+            <!-- 4-Step Journey Horizontal Line -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem;">
+              
+              <div class="card" style="padding: 1.1rem; border-top: 3px solid var(--rose-400);">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--rose-400); text-transform: uppercase;">Step 1</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: #F8FAFC; margin: 0.25rem 0;">Confusion</div>
+                <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45;">
+                  Intimidated by foreign English syntax & spelling errors.
+                </div>
+              </div>
+
+              <div class="card" style="padding: 1.1rem; border-top: 3px solid var(--cyan-400);">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--cyan-400); text-transform: uppercase;">Step 2</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: #F8FAFC; margin: 0.25rem 0;">Familiar Entry</div>
+                <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45;">
+                  Writes working logic in Borno (<code>ধরি</code>, <code>যদি</code>, <code>দেখাও</code>).
+                </div>
+              </div>
+
+              <div class="card" style="padding: 1.1rem; border-top: 3px solid var(--emerald-400);">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--emerald-400); text-transform: uppercase;">Step 3</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: #F8FAFC; margin: 0.25rem 0;">Confidence Built</div>
+                <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45;">
+                  Masters variables, branches & computational thinking.
+                </div>
+              </div>
+
+              <div class="card" style="padding: 1.1rem; border-top: 3px solid var(--violet-400);">
+                <div style="font-size: 0.78rem; font-weight: 800; color: var(--violet-400); text-transform: uppercase;">Step 4</div>
+                <div style="font-size: 1.05rem; font-weight: 700; color: #F8FAFC; margin: 0.25rem 0;">Global Mastery</div>
+                <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.45;">
+                  Confidently transitions to Python, Java & C++!
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Closing Pitch Banner -->
+            <div class="hero-quote-box" style="padding: 1.15rem 1.6rem; border-radius: var(--radius-lg); margin-bottom: 0.85rem;">
+              <div style="font-size: 1.25rem; font-weight: 800; color: #F8FAFC; line-height: 1.5; margin-bottom: 0.35rem;">
+                “BornoCompiler is built, tested, and ready. Let us revolutionize programming education together.”
+              </div>
+              <div style="font-size: 0.95rem; color: var(--cyan-400); font-weight: 600;">
+                Empowering the next generation of engineers, problem solvers, and innovators across Bangladesh.
+              </div>
+            </div>
+
+            <!-- Bottom Call to Action Bar -->
+            <div style="display: flex; gap: 1rem; align-items: center; justify-content: center;">
+              <div class="card" style="padding: 0.6rem 1.75rem; flex-direction: row; align-items: center; gap: 0.85rem; border-radius: 30px; border-color: var(--cyan-400); background: linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);">
+                <span style="font-size: 1.15rem;">🚀</span>
+                <span style="font-size: 0.98rem; font-weight: 800; color: #F8FAFC;">
+                  Thank you! Mumshad, Mim & Tasmina welcome your questions and live test execution!
+                </span>
+                <span style="font-size: 1.15rem;">🎯</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           MINIMALIST STEALTH VIVA PROMPTER (Subtle Subtitle HUD)
+           ========================================== -->
+      <div class="viva-speech-bar" id="vivaSpeechBar">
+        <div class="viva-speech-body" id="vivaSpeechBody">
+          <!-- Populated dynamically via app.js with just the spoken script in clean, discreet text -->
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="pres-footer">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+
+      <div class="footer-left">
+        <div class="slide-counter">
+          Slide <span id="currentSlideNum">1</span> / <span id="totalSlideNum">10</span>
+        </div>
+        <div class="keyboard-hints">
+          <span class="kbd">←</span> <span class="kbd">→</span> Nav | <span class="kbd">Space</span> Next | <span class="kbd">V</span> Viva Mode | <span class="kbd">T</span> Theme | <span class="kbd">N</span> Notes | <span class="kbd">F</span> Fullscreen
+        </div>
+      </div>
+
+      <div class="footer-nav">
+        <button class="btn-nav" id="btnPrev" title="Previous Slide (Left Arrow)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Previous
+        </button>
+        <button class="btn-nav primary" id="btnNext" title="Next Slide (Right Arrow or Space)">
+          Next
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Viva Defense Mode Drawer -->
+  <aside class="viva-drawer" id="vivaDrawer">
+    <div class="viva-header">
+      <div class="viva-title">
+        <div class="viva-title-icon">🎯</div>
+        <span>Viva Defense Assistant</span>
+        <span class="viva-slide-badge" id="vivaSlideBadge">Slide 1</span>
+      </div>
+      <button class="btn-icon" id="btnCloseViva" style="width: 28px; height: 28px;" title="Close Viva Mode (Escape)">✕</button>
+    </div>
+    
+    <div class="viva-tabs">
+      <button class="viva-tab-btn active" data-tab="slide-qa">🎯 Slide Q&A</button>
+      <button class="viva-tab-btn" data-tab="teacher-traps">⚠️ Teacher Traps</button>
+      <button class="viva-tab-btn" data-tab="code-refs">💻 Code Pointers</button>
+      <button class="viva-tab-btn" data-tab="master-bank">📚 Master Bank</button>
+    </div>
+
+    <div class="viva-body" id="vivaBody">
+      <!-- Injected dynamically based on active slide and selected tab -->
+    </div>
+  </aside>
+
+  <!-- Presenter Notes Drawer -->
+  <aside class="notes-drawer" id="notesDrawer">
+    <div class="notes-header">
+      <div class="notes-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+        Presenter Talking Points
+      </div>
+      <button class="btn-icon" id="btnCloseNotes" style="width: 28px; height: 28px;">✕</button>
+    </div>
+    <div class="notes-content" id="notesContent">
+      <!-- Injected dynamically per slide -->
+    </div>
+  </aside>
+
+  <!-- Slide Overview Grid Modal -->
+  <div class="overview-modal" id="overviewModal">
+    <div class="overview-header">
+      <div class="overview-title">Presentation Slides Overview (16 Slides)</div>
+      <button class="btn-icon" id="btnCloseOverview">✕</button>
+    </div>
+    <div class="overview-grid" id="overviewGrid">
+      <!-- Injected dynamically for 16 slides -->
+    </div>
+  </div>
+
+  <!-- ==========================================
+       DYNAMIC SPEAKER TRANSITION SPLASH SCREEN
+       ========================================== -->
+  <div class="speaker-splash-overlay" id="speakerSplashOverlay">
+    <div class="speaker-splash-card" id="speakerSplashCard">
+      <div class="splash-glow-ring"></div>
+      <div class="splash-badge" id="splashBadge">🎤 NOW PRESENTING</div>
+      <div class="splash-avatar" id="splashAvatar">🚀</div>
+      <h1 class="splash-name" id="splashName">Mumshad Chowdhury Mahdi</h1>
+      <div class="splash-role" id="splashRole">Lead Presenter &amp; Product Architect</div>
+      <div class="splash-divider"></div>
+      <div class="splash-topic-box">
+        <div class="splash-topic-label" id="splashTopicLabel">SECTION OVERVIEW</div>
+        <div class="splash-topic-title" id="splashTopicTitle">Product Launch, Customer Persona (Jogonnath) &amp; Native Syntax</div>
+        <div class="splash-slides-badge" id="splashSlidesBadge">Covering Slides 1 – 8 (8 Slides)</div>
+      </div>
+      <div class="splash-progress-track">
+        <div class="splash-progress-bar" id="splashProgressBar"></div>
+      </div>
+      <div class="splash-hint">Click anywhere or press <kbd>Space</kbd> / <kbd>→</kbd> to begin</div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
